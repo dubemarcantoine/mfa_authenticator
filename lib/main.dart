@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:otp/otp.dart';
+import 'package:mfa_authenticator/OtpList.dart';
 
 void main() => runApp(App());
 
@@ -37,11 +37,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ListTile(
-        title: Text(
-          '<TOTP CODE HERE>'
-        )
-      ),
+      body: OtpList(),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Scan new code',
