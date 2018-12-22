@@ -143,9 +143,10 @@ class OtpItem {
   final String secret;
   final String issuer;
   final String label;
+  final bool timeBased;
   int otpCode;
 
-  OtpItem({this.id, this.secret, this.issuer, this.label});
+  OtpItem({this.id, this.secret, this.issuer, this.label, this.timeBased});
 
   factory OtpItem.fromMap(Map<String, dynamic> json) =>
       new OtpItem(
@@ -153,6 +154,7 @@ class OtpItem {
         secret: json['secret'],
         issuer: json['issuer'],
         label: json['label'],
+        timeBased: json['time_based'],
       );
 
   Map<String, dynamic> toMap() =>
@@ -161,5 +163,6 @@ class OtpItem {
         'secret': secret,
         'issuer': issuer,
         'label': label,
+        'time_based': timeBased,
       };
 }

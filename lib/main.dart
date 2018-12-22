@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mfa_authenticator/ManualEntry.dart';
 import 'package:mfa_authenticator/OtpList.dart';
 import 'dart:math';
 
@@ -31,14 +32,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   /// The menu options that appear in the FAB
-  static const List<MenuOption> fabMenuOptions = [
-    const MenuOption(Icons.edit, 'Manual entry'),
-    const MenuOption(Icons.camera_alt, 'Scan bar/QR code'),
-  ];
+  List<MenuOption> fabMenuOptions = [];
   AnimationController _controller;
 
   @override
   void initState() {
+    this.fabMenuOptions = [
+      MenuOption(Icons.edit, 'Manual entry', _manualEntry),
+      MenuOption(Icons.camera_alt, 'Scan bar/QR code', _scanCodeEntry),
+    ];
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -52,11 +55,32 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         title: Text(widget.title),
       ),
       body: OtpList(),
-      floatingActionButton: _buildFab()// This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: _buildFab(),
     );
   }
 
-  /// Builds the FAB button
+  void _manualEntry() {
+    Navigator.of(context).push(
+        new MaterialPageRoute<void>(
+            builder: (BuildContext context) {
+              return ManualEntry();
+            },
+        ),
+    );
+  }
+
+  void _scanCodeEntry() {
+    print('scan');
+  }
+
+  void fabMenuPressedHandler() {
+    if (_controller.isDismissed) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
+  }
+
   Widget _buildFab() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -80,7 +104,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               mini: true,
               tooltip: menuOption.getDescription,
               child: Icon(menuOption.getIconData),
-              onPressed: () {},
+              onPressed: () {
+                menuOption.getFunction();
+                fabMenuPressedHandler();
+              },
             ),
           ),
         );
@@ -98,13 +125,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               );
             },
           ),
-          onPressed: () {
-            if (_controller.isDismissed) {
-              _controller.forward();
-            } else {
-              _controller.reverse();
-            }
-          },
+          onPressed: fabMenuPressedHandler,
         ),
       ),
     );
@@ -114,8 +135,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 class MenuOption {
   final IconData iconData;
   final String description;
+  final Function function;
 
-  const MenuOption(this.iconData, this.description);
+  MenuOption(this.iconData, this.description, this.function);
 
   IconData get getIconData {
     return this.iconData;
@@ -123,5 +145,9 @@ class MenuOption {
 
   String get getDescription {
     return this.description;
+  }
+
+  Function get getFunction {
+    return this.function;
   }
 }
