@@ -19,4 +19,9 @@ class OtpItemDataMapper {
     res.isNotEmpty ? res.map((c) => OtpItem.fromMap(c)).toList() : [];
     return list;
   }
+
+  static void delete(int id) async {
+    final db = await DbProvider.db.database;
+    db.delete(otpItemTableName, where: "id = ?", whereArgs: [id]);
+  }
 }

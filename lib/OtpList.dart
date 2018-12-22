@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
 import 'package:otp/otp.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+
+import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
 
 class OtpList extends StatefulWidget {
 
@@ -37,20 +39,36 @@ class _OtpListState extends State<OtpList> {
     );
   }
 
+  void _removeOtpItem(OtpItem otpItem) {
+    setState(() {
+      this.otpItems.removeWhere((itemInList) => itemInList.id == otpItem.id);
+    });
+  }
+
   Widget buildList() {
     print('building list');
     return ListView.builder(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(left: 8.0),
         itemCount: this.otpItems.length,
         itemBuilder: (context, index) {
           final item = this.otpItems[index];
           return Column(
             children: <Widget>[
-              ListTile(
-                title: Text("${item.otpCode}"),
-                subtitle: Text(item.issuer),
+              new Slidable(
+                delegate: new SlidableDrawerDelegate(),
+                child: ListTile(
+                  title: Text("${item.otpCode}"),
+                  subtitle: Text(item.issuer),
+                ),
+                secondaryActions: <Widget>[
+                  new IconSlideAction(
+                    caption: 'Delete',
+                    color: Colors.red,
+                    icon: Icons.delete,
+                    onTap: () => _onDeleteTap(item),
+                  ),
+                ],
               ),
-              Divider(),
             ],
           );
         });
@@ -74,6 +92,49 @@ class _OtpListState extends State<OtpList> {
     setState(() {
       this.generateCodes();
     });
+  }
+
+  void _onDeleteTap(OtpItem item) async {
+    final bool userResponse = await _deleteConfirmationDialog();
+    if (userResponse) {
+      await OtpItemDataMapper.delete(item.id);
+      this._removeOtpItem(item);
+    }
+  }
+
+  Future<bool> _deleteConfirmationDialog() async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to remove the code?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Beware that this action will not disable two factor authentication from your account'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context, false);
+                return false;
+              },
+            ),
+            FlatButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                Navigator.pop(context, true);
+                return true;
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
