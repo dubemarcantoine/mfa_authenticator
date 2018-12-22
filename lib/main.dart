@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mfa_authenticator/OtpList.dart';
+import 'dart:math';
+
+import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
 
 void main() => runApp(App());
 
@@ -26,9 +29,20 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  void _incrementCounter() {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  /// The menu options that appear in the FAB
+  static const List<MenuOption> fabMenuOptions = [
+    const MenuOption(Icons.edit, 'Manual entry'),
+    const MenuOption(Icons.camera_alt, 'Scan bar/QR code'),
+  ];
+  AnimationController _controller;
 
+  @override
+  void initState() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -38,11 +52,76 @@ class _HomePageState extends State<HomePage> {
         title: Text(widget.title),
       ),
       body: OtpList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Scan new code',
-        child: Icon(Icons.camera_alt),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: _buildFab()// This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  /// Builds the FAB button
+  Widget _buildFab() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(fabMenuOptions.length, (int index) {
+        MenuOption menuOption = fabMenuOptions[index];
+        Widget child = Container(
+          height: 70.0,
+          width: 56.0,
+          alignment: FractionalOffset.topCenter,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: _controller,
+              curve: Interval(
+                  0.0,
+                  1.0 - index / fabMenuOptions.length / 2.0,
+                  curve: Curves.easeOut
+              ),
+            ),
+            child: FloatingActionButton(
+              heroTag: null,
+              mini: true,
+              tooltip: menuOption.getDescription,
+              child: Icon(menuOption.getIconData),
+              onPressed: () {},
+            ),
+          ),
+        );
+        return child;
+      }).toList()..add(
+        FloatingActionButton(
+          heroTag: null,
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (BuildContext context, Widget child) {
+              return Transform(
+                transform: new Matrix4.rotationZ(_controller.value * 0.5 * pi),
+                alignment: FractionalOffset.center,
+                child: Icon(_controller.isDismissed ? Icons.add : Icons.close),
+              );
+            },
+          ),
+          onPressed: () {
+            if (_controller.isDismissed) {
+              _controller.forward();
+            } else {
+              _controller.reverse();
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class MenuOption {
+  final IconData iconData;
+  final String description;
+
+  const MenuOption(this.iconData, this.description);
+
+  IconData get getIconData {
+    return this.iconData;
+  }
+
+  String get getDescription {
+    return this.description;
   }
 }
