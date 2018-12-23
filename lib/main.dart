@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mfa_authenticator/ManualEntry.dart';
 import 'package:mfa_authenticator/OtpList.dart';
+import 'package:mfa_authenticator/ScanCodeEntry.dart';
 import 'dart:math';
 
 import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
@@ -60,6 +61,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _manualEntry() {
+    fabMenuPressedHandler();
     Navigator.of(context).push(
         new MaterialPageRoute<void>(
             builder: (BuildContext context) {
@@ -70,7 +72,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   void _scanCodeEntry() {
-    print('scan');
+    fabMenuPressedHandler();
+    Navigator.of(context).push(
+      new MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return ScanCodeEntry();
+        },
+      ),
+    );
   }
 
   void fabMenuPressedHandler() {
