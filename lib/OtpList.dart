@@ -5,7 +5,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
 
+final key = new GlobalKey<_OtpListState>();
+
 class OtpList extends StatefulWidget {
+
+  OtpList() : super(key: key);
 
   @override
   _OtpListState createState() => _OtpListState();
@@ -39,12 +43,6 @@ class _OtpListState extends State<OtpList> {
     );
   }
 
-  void _removeOtpItem(OtpItem otpItem) {
-    setState(() {
-      this.otpItems.removeWhere((itemInList) => itemInList.id == otpItem.id);
-    });
-  }
-
   Widget buildList() {
     print('building list');
     return ListView.builder(
@@ -74,12 +72,21 @@ class _OtpListState extends State<OtpList> {
         });
   }
 
+  void addOtpItem(OtpItem otpItem) async {
+    await OtpItemDataMapper.newOtpItem(otpItem);
+    setState(() {
+      generateCode(otpItem);
+      this.otpItems.add(otpItem);
+    });
+  }
+
   void generateCodes() {
     this.otpItems.forEach((otpItem) => generateCode(otpItem));
   }
 
   void generateCode(OtpItem otpItem) {
-    otpItem.otpCode = OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch);
+    otpItem.otpCode = "${OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch)}"
+        .padLeft(6, '0');
   }
 
   void _startTimer() {
@@ -94,11 +101,13 @@ class _OtpListState extends State<OtpList> {
     });
   }
 
-  void _onDeleteTap(OtpItem item) async {
+  void _onDeleteTap(OtpItem otpItem) async {
     final bool userResponse = await _deleteConfirmationDialog();
     if (userResponse) {
-      await OtpItemDataMapper.delete(item.id);
-      this._removeOtpItem(item);
+      await OtpItemDataMapper.delete(otpItem.id);
+      setState(() {
+        this.otpItems.removeWhere((itemInList) => itemInList.id == otpItem.id);
+      });
     }
   }
 
@@ -140,11 +149,11 @@ class _OtpListState extends State<OtpList> {
 
 class OtpItem {
   final int id;
-  final String secret;
-  final String issuer;
-  final String label;
-  final bool timeBased;
-  int otpCode;
+  String secret;
+  String issuer;
+  String label;
+  bool timeBased;
+  String otpCode;
 
   OtpItem({this.id, this.secret, this.issuer, this.label, this.timeBased});
 

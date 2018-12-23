@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mfa_authenticator/OtpList.dart';
 
 class  ManualEntry extends StatefulWidget {
   @override
@@ -7,7 +8,7 @@ class  ManualEntry extends StatefulWidget {
 
 class _ManualEntryState extends State<ManualEntry> {
   final _formKey = GlobalKey<FormState>();
-  bool timeBased = true;
+  OtpItem otpItem = OtpItem();
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +46,9 @@ class _ManualEntryState extends State<ManualEntry> {
                 return 'The secret key is required';
               }
             },
+            onSaved: (value) {
+              this.otpItem.secret = value;
+            },
           ),
           TextFormField(
             decoration: InputDecoration(
@@ -55,18 +59,24 @@ class _ManualEntryState extends State<ManualEntry> {
                 return 'The account field is required';
               }
             },
+            onSaved: (value) {
+              this.otpItem.label = value;
+            },
           ),
           TextFormField(
             decoration: InputDecoration(
                 labelText: 'Issuer'
             ),
+            onSaved: (value) {
+              this.otpItem.issuer = value;
+            },
           ),
           SwitchListTile(
-            value: this.timeBased,
+            value: this.otpItem.timeBased != null ? this.otpItem.timeBased : true,
             title: Text('Time based'),
             onChanged: (bool newValue) {
               setState(() {
-                this.timeBased = newValue;
+                this.otpItem.timeBased = newValue;
               });
             },
           )
@@ -77,8 +87,10 @@ class _ManualEntryState extends State<ManualEntry> {
 
   VoidCallback _submitForm() {
     return () {
-      if (_formKey.currentState.validate()) {
-
+      if (this._formKey.currentState.validate()) {
+        this._formKey.currentState.save();
+        key.currentState.addOtpItem(otpItem);
+        Navigator.pop(context, true);
       }
     };
   }
