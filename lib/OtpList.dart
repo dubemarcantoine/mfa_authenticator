@@ -47,7 +47,6 @@ class _OtpListState extends State<OtpList> {
   Widget buildList() {
     print('building list');
     return ListView.builder(
-        padding: const EdgeInsets.only(left: 8.0),
         itemCount: this.otpItems.length,
         itemBuilder: (context, index) {
           final item = this.otpItems[index];
@@ -73,6 +72,10 @@ class _OtpListState extends State<OtpList> {
                     onTap: () => _onDeleteTap(item),
                   ),
                 ],
+              ),
+              new Divider(
+                height: 0.0,
+                color: Colors.grey
               ),
             ],
           );

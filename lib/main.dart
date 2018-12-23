@@ -4,8 +4,6 @@ import 'package:mfa_authenticator/OtpList.dart';
 import 'package:mfa_authenticator/ScanCodeEntry.dart';
 import 'dart:math';
 
-import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
-
 void main() => runApp(App());
 
 class App extends StatelessWidget {
@@ -15,7 +13,11 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Authenticator',
       theme: ThemeData(
+        brightness: Brightness.dark,
+        accentColor: Colors.redAccent,
         primarySwatch: Colors.red,
+        primaryColorDark: Colors.red,
+        toggleableActiveColor: Colors.red,
       ),
       home: HomePage(title: 'Authenticator'),
     );
