@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -57,6 +58,12 @@ class _OtpListState extends State<OtpList> {
                 child: ListTile(
                   title: Text("${item.otpCode}"),
                   subtitle: Text(item.issuer),
+                  onTap: () {
+                    Clipboard.setData(new ClipboardData(text: item.otpCode));
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text('Copied code!'),
+                    ));
+                  },
                 ),
                 secondaryActions: <Widget>[
                   new IconSlideAction(
