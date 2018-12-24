@@ -1,5 +1,7 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:qr_mobile_vision/qr_camera.dart';
+import 'package:mfa_authenticator/OtpList.dart';
 
 class ScanCodeEntry extends StatefulWidget {
   @override
@@ -7,8 +9,8 @@ class ScanCodeEntry extends StatefulWidget {
 }
 
 class _ScanCodeEntryState extends State<ScanCodeEntry> {
-  String qr;
-  bool camState = true;
+  bool validationDisabled = false;
+  bool readyToExit = false;
 
   @override
   initState() {
@@ -35,18 +37,63 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
                         style: TextStyle(color: Colors.red),
                       ),
                       qrCodeCallback: (code) {
-                        setState(() {
-                          qr = code;
-                        });
+                        _validateCode(code);
                       },
                     ),
                   ),
                 )
             ),
-            new Text("QRCODE: $qr"),
           ],
         ),
       ),
+    );
+  }
+
+  void _validateCode(String code) {
+    if (!this.validationDisabled) {
+      this.validationDisabled = true;
+      Uri uri = Uri.dataFromString(code);
+      if (!uri.queryParameters.containsKey('secret')) {
+        this._showErrorDialog().then((v) {
+          this.validationDisabled = false;
+        });
+      } else if (!this.readyToExit) {
+        this.readyToExit = true;
+        OtpItem otpItem = new OtpItem(
+          secret: uri.queryParameters['secret']?.toString(),
+          issuer: uri.queryParameters['issuer']?.toString(),
+        );
+        key.currentState.addOtpItem(otpItem);
+        Navigator.pop(context, true);
+        this.validationDisabled = false;
+      }
+    }
+  }
+
+  Future<void> _showErrorDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Invalid code'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Please scan a valid QR code'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
