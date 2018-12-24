@@ -55,7 +55,7 @@ class _OtpListState extends State<OtpList> {
               new Slidable(
                 delegate: new SlidableDrawerDelegate(),
                 child: ListTile(
-                  title: Text("${item.otpCode}"),
+                  title: Text(item.otpCode),
                   subtitle: Text(item.issuer),
                   onTap: () {
                     Clipboard.setData(new ClipboardData(text: item.otpCode));

@@ -57,14 +57,17 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
         this._showErrorDialog().then((v) {
           this.validationDisabled = false;
         });
-      } else if (!this.readyToExit) {
-        this.readyToExit = true;
-        OtpItem otpItem = new OtpItem(
-          secret: uri.queryParameters['secret']?.toString(),
-          issuer: uri.queryParameters['issuer']?.toString(),
-        );
-        key.currentState.addOtpItem(otpItem);
-        Navigator.pop(context, true);
+      } else {
+        if (!this.readyToExit) {
+          this.readyToExit = true;
+          OtpItem otpItem = new OtpItem(
+            secret: uri.queryParameters['secret']?.toString(),
+            issuer: uri.queryParameters['issuer']?.toString(),
+            timeBased: uri.path.toLowerCase().contains('totp'),
+          );
+          key.currentState.addOtpItem(otpItem);
+          Navigator.pop(context, true);
+        }
         this.validationDisabled = false;
       }
     }
