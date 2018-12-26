@@ -83,7 +83,7 @@ class _OtpListState extends State<OtpList> {
   }
 
   void addOtpItem(OtpItem otpItem) async {
-    await OtpItemDataMapper.newOtpItem(otpItem);
+    otpItem.id = await OtpItemDataMapper.newOtpItem(otpItem);
     setState(() {
       generateCode(otpItem);
       this.otpItems.add(otpItem);
@@ -158,7 +158,7 @@ class _OtpListState extends State<OtpList> {
 }
 
 class OtpItem {
-  final int id;
+  int id;
   String secret;
   String issuer;
   String label;

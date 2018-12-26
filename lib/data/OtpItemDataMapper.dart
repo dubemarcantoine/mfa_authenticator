@@ -7,8 +7,7 @@ class OtpItemDataMapper {
 
   static Future<int> newOtpItem(OtpItem otpItem) async {
     final db = await DbProvider.db.database;
-    var res = await db.insert(otpItemTableName, otpItem.toMap());
-    return res;
+    return await db.insert(otpItemTableName, otpItem.toMap());
   }
 
   static Future<List<OtpItem>> getOtpItems() async {
