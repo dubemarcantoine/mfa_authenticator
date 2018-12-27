@@ -88,6 +88,10 @@ class _OtpListState extends State<OtpList> {
       generateCode(otpItem);
       this.otpItems.add(otpItem);
     });
+
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text('Code added successfully!'),
+    ));
   }
 
   void generateCodes() {
