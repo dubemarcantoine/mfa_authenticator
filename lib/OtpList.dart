@@ -16,16 +16,30 @@ class OtpList extends StatefulWidget {
   _OtpListState createState() => _OtpListState();
 }
 
-class _OtpListState extends State<OtpList> {
+class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
 
   List<OtpItem> otpItems = [];
 
   @override
   void initState() {
-    final int timeUntilNextRefresh = (DateTime.now().second - 29).abs();
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    final int timeUntilNextRefresh = (DateTime.now().second - 30).abs();
     print("Time until next refresh ${timeUntilNextRefresh}");
     Future.delayed(
         Duration(seconds: timeUntilNextRefresh), () => _startTimer());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print(state.toString());
   }
 
   @override
