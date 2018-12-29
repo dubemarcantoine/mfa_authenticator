@@ -11,7 +11,6 @@ class OtpItemDataMapper {
   }
 
   static Future<List<OtpItem>> getOtpItems() async {
-    print('fetching all items');
     final db = await DbProvider.db.database;
     var res = await db.query(otpItemTableName);
     List<OtpItem> list =

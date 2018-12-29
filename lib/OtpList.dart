@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:otp/otp.dart';
@@ -19,15 +20,15 @@ class OtpList extends StatefulWidget {
 class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
 
   List<OtpItem> otpItems = [];
+  CancelableOperation initialCountdown;
+  Timer refreshTimer;
+
+  int timeUntilRefresh = 0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    final int timeUntilNextRefresh = (DateTime.now().second - 30).abs();
-    print("Time until next refresh ${timeUntilNextRefresh}");
-    Future.delayed(
-        Duration(seconds: timeUntilNextRefresh), () => _startTimer());
   }
 
   @override
@@ -40,15 +41,26 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     print(state.toString());
+    this.initialCountdown?.cancel();
+    this.refreshTimer?.cancel();
+    switch (state) {
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.suspending:
+        break;
+      case AppLifecycleState.resumed:
+        this._startInitialCountdown();
+        break;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    print('build');
     return FutureBuilder<List<OtpItem>>(
         future: OtpItemDataMapper.getOtpItems(),
         builder: (BuildContext context, AsyncSnapshot<List<OtpItem>> snapshot) {
-          print('data fetched');
           if (snapshot.hasData) {
             this.otpItems = snapshot.data;
             this.generateCodes();
@@ -59,7 +71,6 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
   }
 
   Widget buildList() {
-    print('building list');
     return ListView.builder(
         itemCount: this.otpItems.length,
         itemBuilder: (context, index) {
@@ -117,13 +128,23 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
         .padLeft(6, '0');
   }
 
-  void _startTimer() {
+  void _startInitialCountdown() {
+    this.timeUntilRefresh = (DateTime.now().second - 30).abs();
     this._setOtpCodesFromSecrets();
-    new Timer.periodic(
-        Duration(seconds: 30), (Timer t) => this._setOtpCodesFromSecrets());
+    print("Time until next refresh ${this.timeUntilRefresh}");
+    this.initialCountdown = CancelableOperation.fromFuture(Future.delayed(
+        Duration(seconds: this.timeUntilRefresh), () => _startTimer()));
+  }
+
+  void _startTimer() {
+    this.timeUntilRefresh = 30;
+    print("Time until next refresh ${this.timeUntilRefresh}");
+    this.refreshTimer = Timer.periodic(
+        Duration(seconds: this.timeUntilRefresh), (Timer t) => this._setOtpCodesFromSecrets());
   }
 
   void _setOtpCodesFromSecrets() {
+    print("Next refresh ${this.timeUntilRefresh}");
     setState(() {
       this.generateCodes();
     });
