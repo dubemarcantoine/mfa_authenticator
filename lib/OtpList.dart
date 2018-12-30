@@ -41,14 +41,18 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     print(state.toString());
-    this.initialCountdown?.cancel();
-    this.refreshTimer?.cancel();
     switch (state) {
       case AppLifecycleState.inactive:
+        this.initialCountdown?.cancel();
+        this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.paused:
+        this.initialCountdown?.cancel();
+        this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.suspending:
+        this.initialCountdown?.cancel();
+        this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.resumed:
         this._startInitialCountdown();
@@ -129,7 +133,11 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
   }
 
   void _startInitialCountdown() {
-    this.timeUntilRefresh = (DateTime.now().second - 30).abs();
+    if (DateTime.now().second <= 30) {
+      this.timeUntilRefresh = (DateTime.now().second - 30).abs();
+    } else {
+      this.timeUntilRefresh = (DateTime.now().second - 60).abs();
+    }
     this._setOtpCodesFromSecrets();
     print("Time until next refresh ${this.timeUntilRefresh}");
     this.initialCountdown = CancelableOperation.fromFuture(Future.delayed(
@@ -144,7 +152,7 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
   }
 
   void _setOtpCodesFromSecrets() {
-    print("Next refresh ${this.timeUntilRefresh}");
+    print("Refreshing... Next in 30 secs");
     setState(() {
       this.generateCodes();
     });
