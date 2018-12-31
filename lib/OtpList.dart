@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mfa_authenticator/ManualEntry.dart';
+import 'package:mfa_authenticator/ScanCodeEntry.dart';
+import 'package:mfa_authenticator/main.dart';
 import 'package:otp/otp.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -11,14 +15,20 @@ final key = new GlobalKey<_OtpListState>();
 
 class OtpList extends StatefulWidget {
 
-  OtpList() : super(key: key);
+  String title;
+
+  OtpList(String title) {
+    this.title = title;
+  }
 
   @override
   _OtpListState createState() => _OtpListState();
 }
 
-class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
-
+class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerProviderStateMixin {
+  /// The menu options that appear in the FAB
+  List<MenuOption> fabMenuOptions = [];
+  AnimationController _controller;
   List<OtpItem> otpItems = [];
   CancelableOperation initialCountdown;
   Timer refreshTimer;
@@ -29,6 +39,15 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    this.fabMenuOptions = [
+      MenuOption(Icons.edit, 'Manual entry', _manualEntry),
+      MenuOption(Icons.camera_alt, 'Scan bar/QR code', _scanCodeEntry),
+    ];
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -62,15 +81,21 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<OtpItem>>(
-        future: OtpItemDataMapper.getOtpItems(),
-        builder: (BuildContext context, AsyncSnapshot<List<OtpItem>> snapshot) {
-          if (snapshot.hasData) {
-            this.otpItems = snapshot.data;
-            this.generateCodes();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: FutureBuilder<List<OtpItem>>(
+          future: OtpItemDataMapper.getOtpItems(),
+          builder: (BuildContext context, AsyncSnapshot<List<OtpItem>> snapshot) {
+            if (snapshot.hasData) {
+              this.otpItems = snapshot.data;
+              this.generateCodes();
+            }
+            return buildList();
           }
-          return buildList();
-        }
+      ),
+      floatingActionButton: _buildFab(),
     );
   }
 
@@ -109,6 +134,86 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver {
             ],
           );
         });
+  }
+
+  void _manualEntry() {
+    fabMenuPressedHandler();
+    Navigator.of(context).push(
+      new MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return ManualEntry();
+        },
+      ),
+    );
+  }
+
+  void _scanCodeEntry() {
+    fabMenuPressedHandler();
+    Navigator.of(context).push(
+      new MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return ScanCodeEntry();
+        },
+      ),
+    );
+  }
+
+  void fabMenuPressedHandler() {
+    if (_controller.isDismissed) {
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
+  }
+
+  Widget _buildFab() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(fabMenuOptions.length, (int index) {
+        MenuOption menuOption = fabMenuOptions[index];
+        Widget child = Container(
+          height: 70.0,
+          width: 56.0,
+          alignment: FractionalOffset.topCenter,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: _controller,
+              curve: Interval(0.0, 1.0 - index / fabMenuOptions.length / 2.0,
+                  curve: Curves.easeOut),
+            ),
+            child: FloatingActionButton(
+              heroTag: null,
+              mini: true,
+              tooltip: menuOption.getDescription,
+              child: Icon(menuOption.getIconData),
+              onPressed: () {
+                menuOption.getFunction();
+                fabMenuPressedHandler();
+              },
+            ),
+          ),
+        );
+        return child;
+      }).toList()
+        ..add(
+          FloatingActionButton(
+            heroTag: null,
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (BuildContext context, Widget child) {
+                return Transform(
+                  transform:
+                  new Matrix4.rotationZ(_controller.value * 0.5 * pi),
+                  alignment: FractionalOffset.center,
+                  child:
+                  Icon(_controller.isDismissed ? Icons.add : Icons.close),
+                );
+              },
+            ),
+            onPressed: fabMenuPressedHandler,
+          ),
+        ),
+    );
   }
 
   void addOtpItem(OtpItem otpItem) async {
