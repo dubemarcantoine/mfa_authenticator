@@ -84,6 +84,9 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          Text('30'), // TODO: See countdown here => https://stackoverflow.com/questions/44302588/flutter-create-a-countdown-widget
+        ]
       ),
       body: FutureBuilder<List<OtpItem>>(
           future: OtpItemDataMapper.getOtpItems(),
