@@ -40,23 +40,3 @@ class _HomePageState extends State<HomePage> {
     return OtpList(widget.title);
   }
 }
-
-class MenuOption {
-  final IconData iconData;
-  final String description;
-  final Function function;
-
-  MenuOption(this.iconData, this.description, this.function);
-
-  IconData get getIconData {
-    return this.iconData;
-  }
-
-  String get getDescription {
-    return this.description;
-  }
-
-  Function get getFunction {
-    return this.function;
-  }
-}

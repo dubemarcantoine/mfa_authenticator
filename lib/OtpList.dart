@@ -1,11 +1,8 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mfa_authenticator/ManualEntry.dart';
-import 'package:mfa_authenticator/ScanCodeEntry.dart';
-import 'package:mfa_authenticator/main.dart';
+import 'package:mfa_authenticator/OtpOptionFabMenu.dart';
 import 'package:otp/otp.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -26,9 +23,7 @@ class OtpList extends StatefulWidget {
 }
 
 class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerProviderStateMixin {
-  /// The menu options that appear in the FAB
-  List<MenuOption> fabMenuOptions = [];
-  AnimationController _controller;
+  AnimationController countdownAnimationCountroller;
   List<OtpItem> otpItems = [];
   CancelableOperation initialCountdown;
   Timer refreshTimer;
@@ -39,14 +34,10 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    this.fabMenuOptions = [
-      MenuOption(Icons.edit, 'Manual entry', _manualEntry),
-      MenuOption(Icons.camera_alt, 'Scan bar/QR code', _scanCodeEntry),
-    ];
 
-    _controller = AnimationController(
+    this.countdownAnimationCountroller = new AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: new Duration(seconds: this.timeUntilRefresh),
     );
   }
 
@@ -85,7 +76,16 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          Text('30'), // TODO: See countdown here => https://stackoverflow.com/questions/44302588/flutter-create-a-countdown-widget
+          Center(
+            child: Center(
+              child: Countdown(
+                animation: StepTween(
+                  begin: this.timeUntilRefresh,
+                  end: 0,
+                ).animate(countdownAnimationCountroller),
+              ),
+            ),
+          ),
         ]
       ),
       body: FutureBuilder<List<OtpItem>>(
@@ -98,7 +98,7 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
             return buildList();
           }
       ),
-      floatingActionButton: _buildFab(),
+      floatingActionButton: OtpOptionFabMenu(),
     );
   }
 
@@ -137,86 +137,6 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
             ],
           );
         });
-  }
-
-  void _manualEntry() {
-    fabMenuPressedHandler();
-    Navigator.of(context).push(
-      new MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return ManualEntry();
-        },
-      ),
-    );
-  }
-
-  void _scanCodeEntry() {
-    fabMenuPressedHandler();
-    Navigator.of(context).push(
-      new MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          return ScanCodeEntry();
-        },
-      ),
-    );
-  }
-
-  void fabMenuPressedHandler() {
-    if (_controller.isDismissed) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
-    }
-  }
-
-  Widget _buildFab() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(fabMenuOptions.length, (int index) {
-        MenuOption menuOption = fabMenuOptions[index];
-        Widget child = Container(
-          height: 70.0,
-          width: 56.0,
-          alignment: FractionalOffset.topCenter,
-          child: ScaleTransition(
-            scale: CurvedAnimation(
-              parent: _controller,
-              curve: Interval(0.0, 1.0 - index / fabMenuOptions.length / 2.0,
-                  curve: Curves.easeOut),
-            ),
-            child: FloatingActionButton(
-              heroTag: null,
-              mini: true,
-              tooltip: menuOption.getDescription,
-              child: Icon(menuOption.getIconData),
-              onPressed: () {
-                menuOption.getFunction();
-                fabMenuPressedHandler();
-              },
-            ),
-          ),
-        );
-        return child;
-      }).toList()
-        ..add(
-          FloatingActionButton(
-            heroTag: null,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (BuildContext context, Widget child) {
-                return Transform(
-                  transform:
-                  new Matrix4.rotationZ(_controller.value * 0.5 * pi),
-                  alignment: FractionalOffset.center,
-                  child:
-                  Icon(_controller.isDismissed ? Icons.add : Icons.close),
-                );
-              },
-            ),
-            onPressed: fabMenuPressedHandler,
-          ),
-        ),
-    );
   }
 
   void addOtpItem(OtpItem otpItem) async {
@@ -260,7 +180,9 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
   }
 
   void _setOtpCodesFromSecrets() {
-    print("Refreshing... Next in 30 secs");
+    print("Refreshing... Next in ${this.timeUntilRefresh} secs");
+    this.countdownAnimationCountroller.value = this.timeUntilRefresh.toDouble();
+    this.countdownAnimationCountroller.forward(from: 0.0);
     setState(() {
       this.generateCodes();
     });
@@ -308,6 +230,18 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
           ],
         );
       },
+    );
+  }
+}
+
+class Countdown extends AnimatedWidget {
+  Countdown({ Key key, this.animation }) : super(key: key, listenable: animation);
+  Animation<int> animation;
+
+  @override
+  build(BuildContext context){
+    return new Text(
+      animation.value.toString(),
     );
   }
 }
