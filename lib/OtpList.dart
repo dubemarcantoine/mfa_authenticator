@@ -65,6 +65,8 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
         this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.resumed:
+        this.initialCountdown = null;
+        this.refreshTimer = null;
         this._startInitialCountdown();
         break;
     }
