@@ -1,9 +1,8 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
-
 import 'package:mfa_authenticator/TimeHelper.dart';
 
 class CountdownTimer extends StatefulWidget {
@@ -11,7 +10,8 @@ class CountdownTimer extends StatefulWidget {
   _CountdownTimerState createState() => _CountdownTimerState();
 }
 
-class _CountdownTimerState extends State<CountdownTimer> with TickerProviderStateMixin, WidgetsBindingObserver {
+class _CountdownTimerState extends State<CountdownTimer>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   AnimationController controller;
 
   String get timerString {
@@ -57,54 +57,64 @@ class _CountdownTimerState extends State<CountdownTimer> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
-    return SizedBox(
-      width: 30,
-      height: 30,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            child: Align(
-              alignment: FractionalOffset.center,
-              child: AspectRatio(
-                aspectRatio: 1.0,
-                child: Stack(
-                  children: <Widget>[
-                    Positioned.fill(
-                      child: AnimatedBuilder(
-                        animation: controller,
-                        builder: (BuildContext context, Widget child) {
-                          return new CustomPaint(
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 0,
+        top: 0,
+        right: 5,
+        bottom: 0,
+      ),
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              child: Align(
+                alignment: FractionalOffset.center,
+                child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned.fill(
+                        child: AnimatedBuilder(
+                          animation: controller,
+                          builder: (BuildContext context, Widget child) {
+                            return new CustomPaint(
                               painter: TimerPainter(
                                 animation: controller,
                                 backgroundColor: Colors.white,
                                 color: themeData.indicatorColor,
-                              ));
-                        },
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    Align(
-                      alignment: FractionalOffset.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          AnimatedBuilder(
+                      Align(
+                        alignment: FractionalOffset.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            AnimatedBuilder(
                               animation: controller,
                               builder: (BuildContext context, Widget child) {
                                 return new Text(
                                   timerString,
                                 );
-                              }),
-                        ],
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -112,12 +122,11 @@ class _CountdownTimerState extends State<CountdownTimer> with TickerProviderStat
   void _initInitialCountdown() {
     final int secondsUntilNextRefresh = TimeHelper.getSecondsUntilNextRefresh();
     _startCountdown(secondsUntilNextRefresh);
-    CancelableOperation.fromFuture(Future.delayed(
-        Duration(seconds: secondsUntilNextRefresh), () => _initCountdownRefreshTimer()));
+    this._startCountdown(30);
+    CancelableOperation.fromFuture(Future.delayed(Duration(seconds: secondsUntilNextRefresh), () => _initCountdownRefreshTimer()));
   }
 
   void _initCountdownRefreshTimer() {
-    this._startCountdown(30);
     Timer.periodic(Duration(seconds: 30), (Timer t) => this._startCountdown(30));
   }
 

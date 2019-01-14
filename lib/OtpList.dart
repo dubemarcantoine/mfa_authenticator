@@ -1,18 +1,17 @@
 import 'dart:async';
+
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mfa_authenticator/CountdownTimer.dart';
 import 'package:mfa_authenticator/OtpOptionFabMenu.dart';
-import 'package:otp/otp.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-
 import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
+import 'package:otp/otp.dart';
 
 final key = new GlobalKey<_OtpListState>();
 
 class OtpList extends StatefulWidget {
-
   String title;
 
   OtpList({this.title}) : super(key: key);
@@ -21,7 +20,8 @@ class OtpList extends StatefulWidget {
   _OtpListState createState() => _OtpListState();
 }
 
-class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerProviderStateMixin {
+class _OtpListState extends State<OtpList>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OtpItem> otpItems = [];
   CancelableOperation initialCountdown;
@@ -72,20 +72,35 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.title),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+            );
+          },
+        ),
         actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {},
+          ),
           CountdownTimer(),
         ],
       ),
       body: FutureBuilder<List<OtpItem>>(
           future: OtpItemDataMapper.getOtpItems(),
-          builder: (BuildContext context, AsyncSnapshot<List<OtpItem>> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<List<OtpItem>> snapshot) {
             if (snapshot.hasData) {
               this.otpItems = snapshot.data;
               this.generateCodes();
             }
             return buildList();
-          }
-      ),
+          }),
       floatingActionButton: OtpOptionFabMenu(),
     );
   }
@@ -118,10 +133,7 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
                   ),
                 ],
               ),
-              new Divider(
-                height: 0.0,
-                color: Colors.grey
-              ),
+              new Divider(height: 0.0, color: Colors.grey),
             ],
           );
         });
@@ -143,8 +155,9 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
   }
 
   void generateCode(OtpItem otpItem) {
-    otpItem.otpCode = "${OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch)}"
-        .padLeft(6, '0');
+    otpItem.otpCode =
+        "${OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch)}"
+            .padLeft(6, '0');
   }
 
   void _startInitialCountdown() {
@@ -162,8 +175,8 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
   void _startTimer() {
     this.timeUntilRefresh = 30;
     print("Time until next refresh ${this.timeUntilRefresh}");
-    this.refreshTimer = Timer.periodic(
-        Duration(seconds: this.timeUntilRefresh), (Timer t) => this._setOtpCodesFromSecrets());
+    this.refreshTimer = Timer.periodic(Duration(seconds: this.timeUntilRefresh),
+        (Timer t) => this._setOtpCodesFromSecrets());
   }
 
   void _setOtpCodesFromSecrets() {
@@ -193,7 +206,8 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Beware that this action will not disable two factor authentication from your account'),
+                Text(
+                    'Beware that this action will not disable two factor authentication from your account'),
               ],
             ),
           ),
@@ -229,8 +243,7 @@ class OtpItem {
 
   OtpItem({this.id, this.secret, this.issuer, this.label, this.timeBased});
 
-  factory OtpItem.fromMap(Map<String, dynamic> json) =>
-      new OtpItem(
+  factory OtpItem.fromMap(Map<String, dynamic> json) => new OtpItem(
         id: json['id'],
         secret: json['secret'],
         issuer: json['issuer'],
@@ -238,8 +251,7 @@ class OtpItem {
         timeBased: json['time_based'],
       );
 
-  Map<String, dynamic> toMap() =>
-      {
+  Map<String, dynamic> toMap() => {
         'id': id,
         'secret': secret,
         'issuer': issuer,
