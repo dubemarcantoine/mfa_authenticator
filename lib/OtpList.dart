@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mfa_authenticator/CountdownTimer.dart';
 import 'package:mfa_authenticator/OtpOptionFabMenu.dart';
 import 'package:otp/otp.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -14,16 +15,13 @@ class OtpList extends StatefulWidget {
 
   String title;
 
-  OtpList(String title) {
-    this.title = title;
-  }
+  OtpList({this.title}) {}
 
   @override
   _OtpListState createState() => _OtpListState();
 }
 
 class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerProviderStateMixin {
-  AnimationController countdownAnimationCountroller;
   List<OtpItem> otpItems = [];
   CancelableOperation initialCountdown;
   Timer refreshTimer;
@@ -34,11 +32,6 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    this.countdownAnimationCountroller = new AnimationController(
-      vsync: this,
-      duration: new Duration(seconds: this.timeUntilRefresh),
-    );
   }
 
   @override
@@ -78,17 +71,8 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
-          Center(
-            child: Center(
-              child: Countdown(
-                animation: StepTween(
-                  begin: this.timeUntilRefresh,
-                  end: 0,
-                ).animate(countdownAnimationCountroller),
-              ),
-            ),
-          ),
-        ]
+          CountdownTimer(),
+        ],
       ),
       body: FutureBuilder<List<OtpItem>>(
           future: OtpItemDataMapper.getOtpItems(),
@@ -183,8 +167,6 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
 
   void _setOtpCodesFromSecrets() {
     print("Refreshing... Next in ${this.timeUntilRefresh} secs");
-    this.countdownAnimationCountroller.value = this.timeUntilRefresh.toDouble();
-    this.countdownAnimationCountroller.forward(from: 0.0);
     setState(() {
       this.generateCodes();
     });
@@ -232,18 +214,6 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
           ],
         );
       },
-    );
-  }
-}
-
-class Countdown extends AnimatedWidget {
-  Countdown({ Key key, this.animation }) : super(key: key, listenable: animation);
-  Animation<int> animation;
-
-  @override
-  build(BuildContext context){
-    return new Text(
-      animation.value.toString(),
     );
   }
 }
