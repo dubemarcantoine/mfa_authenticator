@@ -22,6 +22,7 @@ class OtpList extends StatefulWidget {
 }
 
 class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerProviderStateMixin {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OtpItem> otpItems = [];
   CancelableOperation initialCountdown;
   Timer refreshTimer;
@@ -68,6 +69,7 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
@@ -131,8 +133,7 @@ class _OtpListState extends State<OtpList> with WidgetsBindingObserver, TickerPr
       generateCode(otpItem);
       this.otpItems.add(otpItem);
     });
-
-    Scaffold.of(context).showSnackBar(SnackBar(
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text('Code added successfully!'),
     ));
   }

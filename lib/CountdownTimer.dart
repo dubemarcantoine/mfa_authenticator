@@ -1,30 +1,57 @@
+import 'dart:async';
+
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:mfa_authenticator/TimeHelper.dart';
 
 class CountdownTimer extends StatefulWidget {
   @override
   _CountdownTimerState createState() => _CountdownTimerState();
 }
 
-class _CountdownTimerState extends State<CountdownTimer> with TickerProviderStateMixin {
+class _CountdownTimerState extends State<CountdownTimer> with TickerProviderStateMixin, WidgetsBindingObserver {
   AnimationController controller;
 
   String get timerString {
-    Duration duration = controller.duration * controller.value;
-    return duration.inSeconds.toString();
+    if (controller.duration != null) {
+      Duration duration = controller.duration * controller.value;
+      return duration.inSeconds.toString();
+    } else {
+      return '0';
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 15),
     );
-    controller.reverse(
-        from: controller.value == 0.0
-            ? 1.0
-            : controller.value);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.suspending:
+        break;
+      case AppLifecycleState.resumed:
+        _initInitialCountdown();
+        break;
+    }
   }
 
   @override
@@ -80,6 +107,23 @@ class _CountdownTimerState extends State<CountdownTimer> with TickerProviderStat
         ],
       ),
     );
+  }
+
+  void _initInitialCountdown() {
+    final int secondsUntilNextRefresh = TimeHelper.getSecondsUntilNextRefresh();
+    _startCountdown(secondsUntilNextRefresh);
+    CancelableOperation.fromFuture(Future.delayed(
+        Duration(seconds: secondsUntilNextRefresh), () => _initCountdownRefreshTimer()));
+  }
+
+  void _initCountdownRefreshTimer() {
+    this._startCountdown(30);
+    Timer.periodic(Duration(seconds: 30), (Timer t) => this._startCountdown(30));
+  }
+
+  void _startCountdown(int secondsUntilNextRefresh) {
+    controller.duration = Duration(seconds: secondsUntilNextRefresh);
+    controller.reverse(from: 1.0);
   }
 }
 
