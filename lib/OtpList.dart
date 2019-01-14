@@ -15,7 +15,7 @@ class OtpList extends StatefulWidget {
 
   String title;
 
-  OtpList({this.title}) {}
+  OtpList({this.title}) : super(key: key);
 
   @override
   _OtpListState createState() => _OtpListState();
