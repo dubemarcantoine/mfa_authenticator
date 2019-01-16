@@ -122,11 +122,11 @@ class _CountdownTimerState extends State<CountdownTimer>
   void _initInitialCountdown() {
     final int secondsUntilNextRefresh = TimeHelper.getSecondsUntilNextRefresh();
     _startCountdown(secondsUntilNextRefresh);
-    this._startCountdown(30);
     CancelableOperation.fromFuture(Future.delayed(Duration(seconds: secondsUntilNextRefresh), () => _initCountdownRefreshTimer()));
   }
 
   void _initCountdownRefreshTimer() {
+    _startCountdown(30);
     Timer.periodic(Duration(seconds: 30), (Timer t) => this._startCountdown(30));
   }
 
