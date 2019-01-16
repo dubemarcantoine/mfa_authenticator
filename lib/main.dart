@@ -15,10 +15,10 @@ class App extends StatelessWidget {
       title: 'Authenticator',
       theme: ThemeData(
         brightness: Brightness.dark,
-        accentColor: Colors.redAccent,
-        primarySwatch: Colors.red,
-        primaryColorDark: Colors.red,
-        toggleableActiveColor: Colors.red,
+        accentColor: Colors.green,
+        primarySwatch: Colors.green,
+        primaryColorDark: Colors.green,
+        toggleableActiveColor: Colors.green,
       ),
       home: OtpList(title: 'Authenticator'),
     );

@@ -4,6 +4,7 @@ import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:mfa_authenticator/AppDrawer.dart';
 import 'package:mfa_authenticator/CountdownTimer.dart';
 import 'package:mfa_authenticator/OtpOptionFabMenu.dart';
 import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
@@ -91,6 +92,7 @@ class _OtpListState extends State<OtpList>
           CountdownTimer(),
         ],
       ),
+      drawer: AppDrawer(),
       body: FutureBuilder<List<OtpItem>>(
           future: OtpItemDataMapper.getOtpItems(),
           builder:
