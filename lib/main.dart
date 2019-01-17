@@ -55,7 +55,7 @@ class _AppState extends State<App> {
 
   Future<bool> authenticate() async {
     _preferences = await SharedPreferences.getInstance();
-    bool result = _preferences.getBool(SecurityConfig.IS_USING_AUTH_KEY);
+    bool result = _preferences.getBool(SecurityConfig.IS_USING_AUTH_KEY) ?? false;
     if (!result) {
       return Future.value(true);
     } else {
