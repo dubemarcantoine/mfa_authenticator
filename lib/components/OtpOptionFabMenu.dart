@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/ManualEntry.dart';
-import 'package:mfa_authenticator/ScanCodeEntry.dart';
+import 'package:mfa_authenticator/pages/ManualEntry.dart';
+import 'package:mfa_authenticator/pages/ScanCodeEntry.dart';
 
 class OtpOptionFabMenu extends StatefulWidget {
 

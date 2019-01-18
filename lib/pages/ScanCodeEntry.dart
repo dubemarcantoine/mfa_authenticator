@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/OtpList.dart';
+import 'package:mfa_authenticator/pages/OtpList.dart';
 import 'package:mfa_authenticator/model/OtpItem.dart';
 import 'package:qr_mobile_vision/qr_camera.dart';
 

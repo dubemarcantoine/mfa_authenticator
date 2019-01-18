@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/SecurityConfig.dart';
+import 'package:mfa_authenticator/pages/SecurityConfig.dart';
 
 class AppDrawer extends StatefulWidget {
   @override

@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:mfa_authenticator/BiometricsHelper.dart';
-import 'package:mfa_authenticator/LoginError.dart';
-import 'package:mfa_authenticator/OtpList.dart';
-import 'package:mfa_authenticator/SecurityConfig.dart';
+import 'package:mfa_authenticator/pages/LoginError.dart';
+import 'package:mfa_authenticator/pages/OtpList.dart';
+import 'package:mfa_authenticator/pages/SecurityConfig.dart';
+import 'package:mfa_authenticator/helpers/BiometricsHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(Base());
@@ -26,7 +23,7 @@ class _AppState extends State<App> {
   BiometricsHelper _biometricsHelper = BiometricsHelper();
   SharedPreferences _preferences;
 
-  var _result = null;
+  var _result;
 
   @override
   void initState() {
