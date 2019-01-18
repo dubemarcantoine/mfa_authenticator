@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:mfa_authenticator/LoginError.dart';
 import 'package:mfa_authenticator/OtpList.dart';
 import 'package:mfa_authenticator/SecurityConfig.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,8 +38,13 @@ class _AppState extends State<App> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    if (_result == null || !_result) {
-      return Container();
+    Widget homeWidget;
+    if (_result == null) {
+      homeWidget = Container();
+    } else if (!_result) {
+      homeWidget = LoginError();
+    } else {
+      homeWidget = OtpList(title: 'Authenticator');
     }
     return MaterialApp(
       title: 'Authenticator',
@@ -49,14 +55,14 @@ class _AppState extends State<App> {
         primaryColorDark: Colors.green,
         toggleableActiveColor: Colors.green,
       ),
-      home: OtpList(title: 'Authenticator'),
+      home: homeWidget,
     );
   }
 
   Future<bool> authenticate() async {
     _preferences = await SharedPreferences.getInstance();
-    bool result = _preferences.getBool(SecurityConfig.IS_USING_AUTH_KEY) ?? false;
-    if (!result) {
+    bool shouldAuthenticate = _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ?? false;
+    if (!shouldAuthenticate) {
       return Future.value(true);
     } else {
       var localAuth = LocalAuthentication();
@@ -67,8 +73,15 @@ class _AppState extends State<App> {
           return await localAuth.authenticateWithBiometrics(
               localizedReason: 'Please authenticate to view your codes');
         } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-          // Touch ID.
+          return await localAuth.authenticateWithBiometrics(
+              localizedReason: 'Please authenticate to view your codes');
         }
+      } else if (Platform.isAndroid){
+        // TODO: Check auth for Android
+        return Future.value(true);
+      } else {
+        // TODO: Check auth for other platforms???
+        return Future.value(true);
       }
     }
   }

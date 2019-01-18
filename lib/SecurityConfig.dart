@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
+import 'package:mfa_authenticator/BiometricsHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecurityConfig extends StatefulWidget {
-  static const String IS_USING_AUTH_KEY = 'IS_USING_AUTH';
+  static const String IS_USING_BIOMETRICS_AUTH_KEY = 'IS_USING_AUTH';
 
   @override
   _SecurityConfigState createState() => _SecurityConfigState();
 }
 
 class _SecurityConfigState extends State<SecurityConfig> {
-  final LocalAuthentication _localAuthentication = LocalAuthentication();
-  bool _canCheckBiometrics;
-  List<BiometricType> _availableBiometrics;
+  BiometricsHelper biometricsHelper = BiometricsHelper();
   SharedPreferences _preferences;
-  bool _isUsingAuth = false;
-  Function _func = null;
+  bool _isUsingBiometricsAuthentication = false;
+  Function _onBiometricsPreferenceChangeFunction;
 
   void initState() {
     _initPreferences();
@@ -29,60 +27,34 @@ class _SecurityConfigState extends State<SecurityConfig> {
       ),
       body: Center(
         child: SwitchListTile(
-          value: _isUsingAuth,
+          value: _isUsingBiometricsAuthentication,
           title: Text('Enable authentication'),
-          onChanged: _func,
+          onChanged: _onBiometricsPreferenceChangeFunction,
         ),
       ),
     );
   }
 
+  ///  Initializes the preferences.
+  ///  If no biometrics available on device, this preference will not be
+  ///  able to be changed
   void _initPreferences() async {
-    await _checkBiometrics();
-    if (_canCheckBiometrics) {
-      await _getAvailableBiometrics();
-    }
-    if (_availableBiometrics.length > 0) {
-      _func = (bool newValue) {
-        setState(() {
-          _isUsingAuth = newValue;
-          _preferences.setBool(
-              SecurityConfig.IS_USING_AUTH_KEY, _isUsingAuth);
-        });
-      };
+    if (await biometricsHelper.hasBiometrics()) {
+      _onBiometricsPreferenceChangeFunction = _onBiometricsPreferenceChange;
       _preferences = await SharedPreferences.getInstance();
       setState(() {
-        _isUsingAuth =
-            _preferences.getBool(SecurityConfig.IS_USING_AUTH_KEY) ?? false;
+        _isUsingBiometricsAuthentication =
+            _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ??
+                false;
       });
     }
   }
 
-  Future<void> _getAvailableBiometrics() async {
-    List<BiometricType> availableBiometrics;
-    try {
-      availableBiometrics = await _localAuthentication.getAvailableBiometrics();
-    } on Exception catch (e) {
-      print(e);
-      return;
-    }
-
+  void _onBiometricsPreferenceChange(bool newValue) {
     setState(() {
-      _availableBiometrics = availableBiometrics;
+      _isUsingBiometricsAuthentication = newValue;
     });
-  }
-
-  Future<void> _checkBiometrics() async {
-    bool canCheckBiometrics;
-    try {
-      canCheckBiometrics = await _localAuthentication.canCheckBiometrics;
-    } on Exception catch (e) {
-      print(e);
-    }
-    if (!mounted) return;
-
-    setState(() {
-      _canCheckBiometrics = canCheckBiometrics;
-    });
+    _preferences.setBool(
+        SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY, _isUsingBiometricsAuthentication);
   }
 }
