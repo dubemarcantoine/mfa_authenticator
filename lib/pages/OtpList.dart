@@ -8,6 +8,7 @@ import 'package:mfa_authenticator/components/AppDrawer.dart';
 import 'package:mfa_authenticator/components/CountdownTimer.dart';
 import 'package:mfa_authenticator/components/OtpOptionFabMenu.dart';
 import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
+import 'package:mfa_authenticator/helpers/TimeHelper.dart';
 import 'package:mfa_authenticator/model/OtpItem.dart';
 import 'package:otp/otp.dart';
 
@@ -26,7 +27,6 @@ class _OtpListState extends State<OtpList>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OtpItem> otpItems = [];
-  CancelableOperation initialCountdown;
   Timer refreshTimer;
 
   int timeUntilRefresh = 0;
@@ -41,31 +41,6 @@ class _OtpListState extends State<OtpList>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    print(state.toString());
-    switch (state) {
-      case AppLifecycleState.inactive:
-        this.initialCountdown?.cancel();
-        this.refreshTimer?.cancel();
-        break;
-      case AppLifecycleState.paused:
-        this.initialCountdown?.cancel();
-        this.refreshTimer?.cancel();
-        break;
-      case AppLifecycleState.suspending:
-        this.initialCountdown?.cancel();
-        this.refreshTimer?.cancel();
-        break;
-      case AppLifecycleState.resumed:
-        this.initialCountdown = null;
-        this.refreshTimer = null;
-        this._startInitialCountdown();
-        break;
-    }
   }
 
   @override
@@ -100,15 +75,76 @@ class _OtpListState extends State<OtpList>
               (BuildContext context, AsyncSnapshot<List<OtpItem>> snapshot) {
             if (snapshot.hasData) {
               this.otpItems = snapshot.data;
-              this.generateCodes();
+              this._generateCodesFromSecrets();
             }
-            return buildList();
+            return _buildList();
           }),
       floatingActionButton: OtpOptionFabMenu(),
     );
   }
 
-  Widget buildList() {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print(state.toString());
+    switch (state) {
+      case AppLifecycleState.inactive:
+        this.refreshTimer?.cancel();
+        break;
+      case AppLifecycleState.paused:
+        this.refreshTimer?.cancel();
+        break;
+      case AppLifecycleState.suspending:
+        this.refreshTimer?.cancel();
+        break;
+      case AppLifecycleState.resumed:
+        this.refreshTimer = null;
+        this._startInitialCountdown();
+        break;
+    }
+  }
+
+  void addOtpItem(OtpItem otpItem) async {
+    otpItem.id = await OtpItemDataMapper.newOtpItem(otpItem);
+    setState(() {
+      _generateCode(otpItem);
+      this.otpItems.add(otpItem);
+    });
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text('Code added successfully!'),
+    ));
+  }
+
+  void _startInitialCountdown() {
+    this._setStateForOtpCodes();
+    final int secondsUntilNextRefresh = TimeHelper.getSecondsUntilNextRefresh();
+    CancelableOperation.fromFuture(Future.delayed(
+        Duration(seconds: secondsUntilNextRefresh), () => _startTimer()));
+  }
+
+  void _startTimer() {
+    this._setStateForOtpCodes();
+    this.refreshTimer = Timer.periodic(
+        Duration(seconds: 30), (Timer t) => this._setStateForOtpCodes());
+  }
+
+  void _setStateForOtpCodes() {
+    setState(() {
+      this._generateCodesFromSecrets();
+    });
+  }
+
+  void _generateCodesFromSecrets() {
+    this.otpItems.forEach((otpItem) => _generateCode(otpItem));
+  }
+
+  void _generateCode(OtpItem otpItem) {
+    otpItem.otpCode =
+        "${OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch)}"
+            .padLeft(6, '0');
+  }
+
+  Widget _buildList() {
     return ListView.builder(
         itemCount: this.otpItems.length,
         itemBuilder: (context, index) {
@@ -142,53 +178,6 @@ class _OtpListState extends State<OtpList>
         });
   }
 
-  void addOtpItem(OtpItem otpItem) async {
-    otpItem.id = await OtpItemDataMapper.newOtpItem(otpItem);
-    setState(() {
-      generateCode(otpItem);
-      this.otpItems.add(otpItem);
-    });
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
-      content: Text('Code added successfully!'),
-    ));
-  }
-
-  void generateCodes() {
-    this.otpItems.forEach((otpItem) => generateCode(otpItem));
-  }
-
-  void generateCode(OtpItem otpItem) {
-    otpItem.otpCode =
-        "${OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch)}"
-            .padLeft(6, '0');
-  }
-
-  void _startInitialCountdown() {
-    if (DateTime.now().second <= 30) {
-      this.timeUntilRefresh = (DateTime.now().second - 30).abs();
-    } else {
-      this.timeUntilRefresh = (DateTime.now().second - 60).abs();
-    }
-    this._setOtpCodesFromSecrets();
-    print("Time until next refresh ${this.timeUntilRefresh}");
-    this.initialCountdown = CancelableOperation.fromFuture(Future.delayed(
-        Duration(seconds: this.timeUntilRefresh), () => _startTimer()));
-  }
-
-  void _startTimer() {
-    this.timeUntilRefresh = 30;
-    print("Time until next refresh ${this.timeUntilRefresh}");
-    this.refreshTimer = Timer.periodic(Duration(seconds: this.timeUntilRefresh),
-        (Timer t) => this._setOtpCodesFromSecrets());
-  }
-
-  void _setOtpCodesFromSecrets() {
-    print("Refreshing... Next in ${this.timeUntilRefresh} secs");
-    setState(() {
-      this.generateCodes();
-    });
-  }
-
   void _onDeleteTap(OtpItem otpItem) async {
     final bool userResponse = await _deleteConfirmationDialog();
     if (userResponse) {
@@ -209,8 +198,8 @@ class _OtpListState extends State<OtpList>
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(
-                    'Beware that this action will not disable two factor authentication from your account'),
+                Text('Beware that this action will not disable two factor '
+                    'authentication from your associated account'),
               ],
             ),
           ),

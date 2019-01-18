@@ -39,22 +39,6 @@ class _CountdownTimerState extends State<CountdownTimer>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    switch (state) {
-      case AppLifecycleState.inactive:
-        break;
-      case AppLifecycleState.paused:
-        break;
-      case AppLifecycleState.suspending:
-        break;
-      case AppLifecycleState.resumed:
-        _initInitialCountdown();
-        break;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     ThemeData themeData = Theme.of(context);
     return Padding(
@@ -117,6 +101,22 @@ class _CountdownTimerState extends State<CountdownTimer>
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.suspending:
+        break;
+      case AppLifecycleState.resumed:
+        _initInitialCountdown();
+        break;
+    }
   }
 
   void _initInitialCountdown() {

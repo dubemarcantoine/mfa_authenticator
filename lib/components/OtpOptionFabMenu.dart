@@ -5,13 +5,6 @@ import 'package:mfa_authenticator/pages/ManualEntry.dart';
 import 'package:mfa_authenticator/pages/ScanCodeEntry.dart';
 
 class OtpOptionFabMenu extends StatefulWidget {
-
-  String title;
-
-  OtpList(String title) {
-    this.title = title;
-  }
-
   @override
   _OtpOptionFabMenu createState() => _OtpOptionFabMenu();
 }
