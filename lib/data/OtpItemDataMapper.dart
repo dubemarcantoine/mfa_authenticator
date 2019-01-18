@@ -1,8 +1,7 @@
-import 'package:mfa_authenticator/OtpList.dart';
 import 'package:mfa_authenticator/data/DbProvider.dart';
+import 'package:mfa_authenticator/model/OtpItem.dart';
 
 class OtpItemDataMapper {
-
   static final String otpItemTableName = 'otp_item';
 
   static Future<int> newOtpItem(OtpItem otpItem) async {
@@ -14,7 +13,7 @@ class OtpItemDataMapper {
     final db = await DbProvider.db.database;
     var res = await db.query(otpItemTableName);
     List<OtpItem> list =
-    res.isNotEmpty ? res.map((c) => OtpItem.fromMap(c)).toList() : [];
+        res.isNotEmpty ? res.map((c) => OtpItem.fromMap(c)).toList() : [];
     return list;
   }
 
