@@ -4,6 +4,8 @@ class BiometricsHelper {
   static final BiometricsHelper instance = new BiometricsHelper._internal();
   final LocalAuthentication _localAuthentication = LocalAuthentication();
 
+  LocalAuthentication get localAuthentication => _localAuthentication;
+
   factory BiometricsHelper() {
     return instance;
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:mfa_authenticator/BiometricsHelper.dart';
 import 'package:mfa_authenticator/LoginError.dart';
 import 'package:mfa_authenticator/OtpList.dart';
 import 'package:mfa_authenticator/SecurityConfig.dart';
@@ -22,6 +23,7 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  BiometricsHelper _biometricsHelper = BiometricsHelper();
   SharedPreferences _preferences;
 
   var _result = null;
@@ -61,28 +63,20 @@ class _AppState extends State<App> {
 
   Future<bool> authenticate() async {
     _preferences = await SharedPreferences.getInstance();
-    bool shouldAuthenticate = _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ?? false;
+    bool shouldAuthenticate =
+        _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ??
+            false;
     if (!shouldAuthenticate) {
       return Future.value(true);
     } else {
-      var localAuth = LocalAuthentication();
-      List<BiometricType> availableBiometrics =
-          await localAuth.getAvailableBiometrics();
-      if (Platform.isIOS) {
-        if (availableBiometrics.contains(BiometricType.face)) {
-          return await localAuth.authenticateWithBiometrics(
-              localizedReason: 'Please authenticate to view your codes');
-        } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
-          return await localAuth.authenticateWithBiometrics(
-              localizedReason: 'Please authenticate to view your codes');
-        }
-      } else if (Platform.isAndroid){
-        // TODO: Check auth for Android
-        return Future.value(true);
-      } else {
-        // TODO: Check auth for other platforms???
-        return Future.value(true);
+      if (await _biometricsHelper.hasBiometrics()) {
+        return await _biometricsHelper.localAuthentication
+            .authenticateWithBiometrics(
+                localizedReason: 'Please authenticate to view your codes');
       }
+      // If user activated their authentication, but that there are no
+      // biometric sensors available at the moment
+      return Future.value(false);
     }
   }
 }

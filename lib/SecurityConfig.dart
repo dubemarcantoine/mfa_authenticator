@@ -50,11 +50,16 @@ class _SecurityConfigState extends State<SecurityConfig> {
     }
   }
 
-  void _onBiometricsPreferenceChange(bool newValue) {
-    setState(() {
-      _isUsingBiometricsAuthentication = newValue;
-    });
-    _preferences.setBool(
-        SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY, _isUsingBiometricsAuthentication);
+  void _onBiometricsPreferenceChange(bool newValue) async {
+    bool authResult = await biometricsHelper.localAuthentication
+        .authenticateWithBiometrics(
+            localizedReason: 'Please authenticate to procede');
+    if (authResult) {
+      setState(() {
+        _isUsingBiometricsAuthentication = newValue;
+      });
+      _preferences.setBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY,
+          _isUsingBiometricsAuthentication);
+    }
   }
 }
