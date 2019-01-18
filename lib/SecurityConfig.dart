@@ -23,14 +23,25 @@ class _SecurityConfigState extends State<SecurityConfig> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Security Config'),
+        title: const Text('Security'),
       ),
-      body: Center(
-        child: SwitchListTile(
-          value: _isUsingBiometricsAuthentication,
-          title: Text('Enable authentication'),
-          onChanged: _onBiometricsPreferenceChangeFunction,
-        ),
+      body: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+            child: Text(
+              'Enabling security will help keep your account codes secure. '
+                  'A system prompt will ask you to give permission to enable '
+                  'biometric authentication.',
+              textScaleFactor: 1.05,
+            ),
+          ),
+          SwitchListTile(
+            value: _isUsingBiometricsAuthentication,
+            title: Text('Biometric authentication'),
+            onChanged: _onBiometricsPreferenceChangeFunction,
+          ),
+        ],
       ),
     );
   }
