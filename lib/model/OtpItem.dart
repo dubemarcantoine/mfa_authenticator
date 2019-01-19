@@ -3,7 +3,7 @@ class OtpItem {
   String secret;
   String issuer;
   String label;
-  bool timeBased;
+  bool timeBased = true;
   String otpCode;
 
   OtpItem({this.id, this.secret, this.issuer, this.label, this.timeBased});

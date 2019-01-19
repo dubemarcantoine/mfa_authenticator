@@ -72,15 +72,15 @@ class _ManualEntryState extends State<ManualEntry> {
               this.otpItem.issuer = value;
             },
           ),
-          SwitchListTile(
-            value: this.otpItem.timeBased != null ? this.otpItem.timeBased : true,
-            title: Text('Time based'),
-            onChanged: (bool newValue) {
-              setState(() {
-                this.otpItem.timeBased = newValue;
-              });
-            },
-          )
+//          SwitchListTile(
+//            value: this.otpItem.timeBased != null ? this.otpItem.timeBased : true,
+//            title: Text('Time based'),
+//            onChanged: (bool newValue) {
+//              setState(() {
+//                this.otpItem.timeBased = newValue;
+//              });
+//            },
+//          )
         ],
       ),
     );

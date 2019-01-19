@@ -65,7 +65,7 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
           OtpItem otpItem = new OtpItem(
             secret: uri.queryParameters['secret']?.toString(),
             issuer: uri.queryParameters['issuer']?.toString(),
-            timeBased: uri.path.toLowerCase().contains('totp'),
+//            timeBased: uri.path.toLowerCase().contains('totp'),
           );
           key.currentState.addOtpItem(otpItem);
           Navigator.pop(context, true);
