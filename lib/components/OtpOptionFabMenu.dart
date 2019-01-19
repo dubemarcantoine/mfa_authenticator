@@ -9,7 +9,8 @@ class OtpOptionFabMenu extends StatefulWidget {
   _OtpOptionFabMenu createState() => _OtpOptionFabMenu();
 }
 
-class _OtpOptionFabMenu extends State<OtpOptionFabMenu> with TickerProviderStateMixin {
+class _OtpOptionFabMenu extends State<OtpOptionFabMenu>
+    with TickerProviderStateMixin {
   /// The menu options that appear in the FAB
   List<MenuOption> fabMenuOptions = [];
   AnimationController fabAnimationController;
@@ -65,11 +66,12 @@ class _OtpOptionFabMenu extends State<OtpOptionFabMenu> with TickerProviderState
               animation: fabAnimationController,
               builder: (BuildContext context, Widget child) {
                 return Transform(
-                  transform:
-                  new Matrix4.rotationZ(fabAnimationController.value * 0.5 * pi),
+                  transform: new Matrix4.rotationZ(
+                      fabAnimationController.value * 0.5 * pi),
                   alignment: FractionalOffset.center,
-                  child:
-                  Icon(fabAnimationController.isDismissed ? Icons.add : Icons.close),
+                  child: Icon(fabAnimationController.isDismissed
+                      ? Icons.add
+                      : Icons.close),
                 );
               },
             ),

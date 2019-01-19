@@ -49,10 +49,10 @@ class _AppState extends State<App> {
       title: 'Authenticator',
       theme: ThemeData(
         brightness: Brightness.dark,
-        accentColor: Colors.green,
-        primarySwatch: Colors.green,
-        primaryColorDark: Colors.green,
-        toggleableActiveColor: Colors.green,
+        accentColor: Colors.blue,
+        primarySwatch: Colors.blue,
+        primaryColorDark: Colors.blue,
+        toggleableActiveColor: Colors.blue,
       ),
       home: homeWidget,
     );

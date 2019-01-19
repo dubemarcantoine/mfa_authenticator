@@ -27,9 +27,6 @@ class _OtpListState extends State<OtpList>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   List<OtpItem> otpItems = [];
-  Timer refreshTimer;
-
-  int timeUntilRefresh = 0;
 
   @override
   void initState() {
@@ -89,16 +86,12 @@ class _OtpListState extends State<OtpList>
     print(state.toString());
     switch (state) {
       case AppLifecycleState.inactive:
-        this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.paused:
-        this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.suspending:
-        this.refreshTimer?.cancel();
         break;
       case AppLifecycleState.resumed:
-        this.refreshTimer = null;
         this._startInitialCountdown();
         break;
     }
@@ -124,7 +117,7 @@ class _OtpListState extends State<OtpList>
 
   void _startTimer() {
     this._setStateForOtpCodes();
-    this.refreshTimer = Timer.periodic(
+    Timer.periodic(
         Duration(seconds: 30), (Timer t) => this._setStateForOtpCodes());
   }
 

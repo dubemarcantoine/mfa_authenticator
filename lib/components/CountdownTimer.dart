@@ -12,11 +12,11 @@ class CountdownTimer extends StatefulWidget {
 
 class _CountdownTimerState extends State<CountdownTimer>
     with TickerProviderStateMixin, WidgetsBindingObserver {
-  AnimationController controller;
+  AnimationController _controller;
 
   String get timerString {
-    if (controller.duration != null) {
-      Duration duration = controller.duration * controller.value;
+    if (_controller.duration != null) {
+      Duration duration = _controller.duration * _controller.value;
       return duration.inSeconds.toString();
     } else {
       return '0';
@@ -27,7 +27,7 @@ class _CountdownTimerState extends State<CountdownTimer>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    controller = AnimationController(
+    _controller = AnimationController(
       vsync: this,
     );
   }
@@ -35,6 +35,7 @@ class _CountdownTimerState extends State<CountdownTimer>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
     super.dispose();
   }
 
@@ -63,13 +64,13 @@ class _CountdownTimerState extends State<CountdownTimer>
                     children: <Widget>[
                       Positioned.fill(
                         child: AnimatedBuilder(
-                          animation: controller,
+                          animation: _controller,
                           builder: (BuildContext context, Widget child) {
                             return new CustomPaint(
                               painter: TimerPainter(
-                                animation: controller,
-                                backgroundColor: Colors.white,
-                                color: themeData.indicatorColor,
+                                animation: _controller,
+                                backgroundColor: themeData.accentColor,
+                                color: themeData.scaffoldBackgroundColor,
                               ),
                             );
                           },
@@ -82,7 +83,7 @@ class _CountdownTimerState extends State<CountdownTimer>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             AnimatedBuilder(
-                              animation: controller,
+                              animation: _controller,
                               builder: (BuildContext context, Widget child) {
                                 return new Text(
                                   timerString,
@@ -131,8 +132,8 @@ class _CountdownTimerState extends State<CountdownTimer>
   }
 
   void _startCountdown(int secondsUntilNextRefresh) {
-    controller.duration = Duration(seconds: secondsUntilNextRefresh);
-    controller.reverse(from: 1.0);
+    _controller.duration = Duration(seconds: secondsUntilNextRefresh);
+    _controller.reverse(from: 1.0);
   }
 }
 
