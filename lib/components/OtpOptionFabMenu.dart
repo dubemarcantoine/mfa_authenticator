@@ -25,7 +25,7 @@ class _OtpOptionFabMenu extends State<OtpOptionFabMenu>
 
     fabAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 250),
     );
   }
 
