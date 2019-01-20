@@ -63,8 +63,10 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
         if (!this.readyToExit) {
           this.readyToExit = true;
           OtpItem otpItem = new OtpItem(
-            secret: uri.queryParameters['secret']?.toString(),
-            issuer: uri.queryParameters['issuer']?.toString(),
+            secret: uri.queryParameters['secret'],
+            issuer: _getUriIssuer(uri),
+            account: _getUriAccount(uri),
+            digits: _getUriDigits(uri),
 //            timeBased: uri.path.toLowerCase().contains('totp'),
           );
           key.currentState.addOtpItem(otpItem);
@@ -72,6 +74,36 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
         }
         this.validationDisabled = false;
       }
+    }
+  }
+
+  String _getUriIssuer(Uri uri) {
+    String issuer = Uri.decodeFull(uri.queryParameters['issuer']);
+    if (issuer != null) {
+      return issuer;
+    }
+    return _getUriLabelPartAt(uri, 0);
+  }
+
+  String _getUriAccount(Uri uri) {
+    return _getUriLabelPartAt(uri, 1);
+  }
+
+  String _getUriLabelPartAt(Uri uri, int index) {
+    String label = Uri.decodeFull(uri.pathSegments.elementAt(uri.pathSegments.length - 1));
+    List<String> parts = label.split(':');
+    if (parts.length > index) {
+      return parts.elementAt(index);
+    }
+    return '';
+  }
+
+  int _getUriDigits(Uri uri) {
+    String strDigits = uri.queryParameters['digits'];
+    if (strDigits != null) {
+      return int.parse(strDigits);
+    } else {
+      return 6;
     }
   }
 

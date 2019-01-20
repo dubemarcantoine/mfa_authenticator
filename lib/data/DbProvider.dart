@@ -28,8 +28,9 @@ class DbProvider {
             id INTEGER PRIMARY KEY,
             secret TEXT,
             issuer TEXT,
-            label TEXT,
-            time_based BOOL
+            account TEXT,
+            time_based BOOL,
+            length INTEGER
           )""");
     });
   }

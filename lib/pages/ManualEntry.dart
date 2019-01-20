@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/pages/OtpList.dart';
 import 'package:mfa_authenticator/model/OtpItem.dart';
+import 'package:mfa_authenticator/pages/OtpList.dart';
 
-class  ManualEntry extends StatefulWidget {
+class ManualEntry extends StatefulWidget {
   @override
   _ManualEntryState createState() => _ManualEntryState();
 }
 
 class _ManualEntryState extends State<ManualEntry> {
+  static const int MIN_DIGIT_COUNT = 6;
   final _formKey = GlobalKey<FormState>();
-  OtpItem otpItem = OtpItem();
+  OtpItem _otpItem = OtpItem();
+  final List<int> _possibleDigits = List.generate(
+      MIN_DIGIT_COUNT + 1, (int index) => MIN_DIGIT_COUNT + index);
 
   @override
   Widget build(BuildContext context) {
@@ -24,63 +27,115 @@ class _ManualEntryState extends State<ManualEntry> {
           ),
         ],
       ),
-      body: Center(
-        child: buildForm(context),
+      body: Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              _buildMandatoryForm(context),
+              _buildOptionalFormFields(context),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  @override
-  Widget buildForm(BuildContext context) {
+  Widget _buildMandatoryForm(BuildContext context) {
     // Build a Form widget using the _formKey we created above
-    return Form(
-      key: _formKey,
+    return Card(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          TextFormField(
-            decoration: InputDecoration(
-                labelText: 'Secret Key'
-            ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'The secret key is required';
-              }
-            },
-            onSaved: (value) {
-              this.otpItem.secret = value;
-            },
+          ListTile(
+            title: Text('Mandatory Parameters'),
           ),
-          TextFormField(
-            decoration: InputDecoration(
-                labelText: 'Account'
+          Padding(
+            padding: EdgeInsets.fromLTRB(10.0, 0, 10.0, 10.0),
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Secret Key'),
+                  maxLines: 3,
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'The secret key is required';
+                    }
+                  },
+                  onSaved: (value) {
+                    this._otpItem.secret = value;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Issuer'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'The issuer is required';
+                    }
+                  },
+                  onSaved: (value) {
+                    this._otpItem.issuer = value;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Account'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return 'The account is required';
+                    }
+                  },
+                  onSaved: (value) {
+                    this._otpItem.account = value;
+                  },
+                ),
+              ],
             ),
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'The account field is required';
-              }
-            },
-            onSaved: (value) {
-              this.otpItem.label = value;
-            },
           ),
-          TextFormField(
-            decoration: InputDecoration(
-                labelText: 'Issuer'
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOptionalFormFields(BuildContext context) {
+    return Card(
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text('Optional Parameters'),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(10.0, 0, 10.0, 10.0),
+            child: Column(
+              children: <Widget>[
+                FormField(
+                  builder: (FormFieldState state) {
+                    return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Digits',
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _otpItem.digits?.toString(),
+                          isDense: true,
+                          onChanged: (String newValue) {
+                            setState(() {
+                              _otpItem.digits = int.parse(newValue);
+                            });
+                          },
+                          items: _possibleDigits.map((value) {
+                            return DropdownMenuItem<String>(
+                              value: value?.toString(),
+                              child: Text(value?.toString()),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-            onSaved: (value) {
-              this.otpItem.issuer = value;
-            },
           ),
-//          SwitchListTile(
-//            value: this.otpItem.timeBased != null ? this.otpItem.timeBased : true,
-//            title: Text('Time based'),
-//            onChanged: (bool newValue) {
-//              setState(() {
-//                this.otpItem.timeBased = newValue;
-//              });
-//            },
-//          )
         ],
       ),
     );
@@ -90,7 +145,7 @@ class _ManualEntryState extends State<ManualEntry> {
     return () {
       if (this._formKey.currentState.validate()) {
         this._formKey.currentState.save();
-        key.currentState.addOtpItem(otpItem);
+        key.currentState.addOtpItem(_otpItem);
         Navigator.pop(context, true);
       }
     };

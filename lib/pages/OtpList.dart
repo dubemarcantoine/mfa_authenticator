@@ -132,9 +132,11 @@ class _OtpListState extends State<OtpList>
   }
 
   void _generateCode(OtpItem otpItem) {
-    otpItem.otpCode =
-        "${OTP.generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch)}"
-            .padLeft(6, '0');
+    final String generatedCode = OTP
+        .generateTOTPCode(otpItem.secret, DateTime.now().millisecondsSinceEpoch,
+            length: otpItem.digits)
+        .toString();
+    otpItem.otpCode = generatedCode.padLeft(otpItem.digits, '0');
   }
 
   Widget _buildList() {
@@ -147,7 +149,7 @@ class _OtpListState extends State<OtpList>
               new Slidable(
                 delegate: new SlidableDrawerDelegate(),
                 child: ListTile(
-                  title: Text(item.otpCode),
+                  title: Text(_formatOtpCode(item.otpCode)),
                   subtitle: Text(item.issuer),
                   onTap: () {
                     Clipboard.setData(new ClipboardData(text: item.otpCode));
@@ -169,6 +171,11 @@ class _OtpListState extends State<OtpList>
             ],
           );
         });
+  }
+
+  String _formatOtpCode(String otpCode) {
+    return otpCode?.splitMapJoin(RegExp('..'),
+        onMatch: (m) => '${m.group(0)} ');
   }
 
   void _onDeleteTap(OtpItem otpItem) async {
