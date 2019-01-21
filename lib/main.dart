@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(Base());
 
+final appKey = new GlobalKey<_AppState>();
+
 class Base extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -15,6 +17,9 @@ class Base extends StatelessWidget {
 }
 
 class App extends StatefulWidget {
+
+  App(): super(key: appKey);
+
   @override
   _AppState createState() => _AppState();
 }
@@ -27,11 +32,7 @@ class _AppState extends State<App> {
 
   @override
   void initState() {
-    authenticate().then((res) {
-      setState(() {
-        _result = res;
-      });
-    });
+    tryAuthenticate();
   }
 
   // This widget is the root of your application.
@@ -58,7 +59,15 @@ class _AppState extends State<App> {
     );
   }
 
-  Future<bool> authenticate() async {
+  void tryAuthenticate() {
+    _authenticate().then((res) {
+      setState(() {
+        _result = res;
+      });
+    });
+  }
+
+  Future<bool> _authenticate() async {
     _preferences = await SharedPreferences.getInstance();
     bool shouldAuthenticate =
         _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ??
