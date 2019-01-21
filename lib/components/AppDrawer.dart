@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mfa_authenticator/pages/SecurityConfig.dart';
 
 class AppDrawer extends StatefulWidget {
@@ -7,6 +8,9 @@ class AppDrawer extends StatefulWidget {
 }
 
 class _AppDrawerState extends State<AppDrawer> {
+  static const platform =
+      const MethodChannel('dubemarcantoine.github.io/authenticator_mfa');
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -30,6 +34,13 @@ class _AppDrawerState extends State<AppDrawer> {
                   },
                 ),
               );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('App Preferences'),
+            onTap: () {
+              platform.invokeMethod('openAppPreferences');
             },
           ),
         ],

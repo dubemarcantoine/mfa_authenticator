@@ -18,7 +18,7 @@ class LoginError extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
             child: Text(
               'Error when authenticating. '
-                  'Please make sure biometrics are active in your settings and try again.',
+                  'Please make sure that the biometrics are active in your Settings app and try again.',
               textScaleFactor: 1.05,
             ),
           ),

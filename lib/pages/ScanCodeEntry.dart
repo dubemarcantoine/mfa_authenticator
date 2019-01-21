@@ -1,8 +1,8 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/pages/OtpList.dart';
 import 'package:mfa_authenticator/model/OtpItem.dart';
+import 'package:mfa_authenticator/pages/OtpList.dart';
 import 'package:qr_mobile_vision/qr_camera.dart';
 
 class ScanCodeEntry extends StatefulWidget {
@@ -32,19 +32,33 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
           children: <Widget>[
             new Expanded(
                 child: new Center(
-                  child: new SizedBox(
-                    child: new QrCamera(
-                      onError: (context, error) => Text(
-                        error.toString(),
-                        style: TextStyle(color: Colors.red),
+              child: new SizedBox(
+                child: new QrCamera(
+                  onError: (context, error) => Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                            child: Text(
+                              'Could not open camera. '
+                                  'Please make sure that the camer is active in your Settings app and try again.',
+                              textScaleFactor: 1.05,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                            child: Text(
+                              'If your device does not have a camera, please input the code manually.',
+                              textScaleFactor: 1.05,
+                            ),
+                          ),
+                        ],
                       ),
-                      qrCodeCallback: (code) {
-                        _validateCode(code);
-                      },
-                    ),
-                  ),
-                )
-            ),
+                  qrCodeCallback: (code) {
+                    _validateCode(code);
+                  },
+                ),
+              ),
+            )),
           ],
         ),
       ),
@@ -90,7 +104,8 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
   }
 
   String _getUriLabelPartAt(Uri uri, int index) {
-    String label = Uri.decodeFull(uri.pathSegments.elementAt(uri.pathSegments.length - 1));
+    String label =
+        Uri.decodeFull(uri.pathSegments.elementAt(uri.pathSegments.length - 1));
     List<String> parts = label.split(':');
     if (parts.length > index) {
       return parts.elementAt(index);
