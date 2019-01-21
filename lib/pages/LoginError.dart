@@ -1,10 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mfa_authenticator/main.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginError extends StatelessWidget {
+  static const platform =
+      const MethodChannel('dubemarcantoine.github.io/authenticator_mfa');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,15 +38,6 @@ class LoginError extends StatelessWidget {
   }
 
   void _goToSettings() async {
-    String url;
-    if (Platform.isIOS) {
-      url = 'App-prefs:root?path=Authenticator%20MFA';
-    }
-    if (await canLaunch(url)) {
-      print('launch');
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+    platform.invokeMethod('openAppPreferences');
   }
 }
