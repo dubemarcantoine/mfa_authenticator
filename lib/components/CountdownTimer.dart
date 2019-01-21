@@ -30,6 +30,7 @@ class _CountdownTimerState extends State<CountdownTimer>
     _controller = AnimationController(
       vsync: this,
     );
+    _initInitialCountdown();
   }
 
   @override
@@ -107,6 +108,7 @@ class _CountdownTimerState extends State<CountdownTimer>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
+    print(state.toString());
     switch (state) {
       case AppLifecycleState.inactive:
         break;

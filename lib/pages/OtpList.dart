@@ -12,12 +12,12 @@ import 'package:mfa_authenticator/helpers/TimeHelper.dart';
 import 'package:mfa_authenticator/model/OtpItem.dart';
 import 'package:otp/otp.dart';
 
-final key = new GlobalKey<_OtpListState>();
+final otpListKey = new GlobalKey<_OtpListState>();
 
 class OtpList extends StatefulWidget {
   String title;
 
-  OtpList({this.title}) : super(key: key);
+  OtpList({this.title}) : super(key: otpListKey);
 
   @override
   _OtpListState createState() => _OtpListState();
@@ -32,6 +32,7 @@ class _OtpListState extends State<OtpList>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _startInitialCountdown();
   }
 
   @override
@@ -92,7 +93,7 @@ class _OtpListState extends State<OtpList>
       case AppLifecycleState.suspending:
         break;
       case AppLifecycleState.resumed:
-        this._startInitialCountdown();
+        _startInitialCountdown();
         break;
     }
   }
@@ -149,8 +150,25 @@ class _OtpListState extends State<OtpList>
               new Slidable(
                 delegate: new SlidableDrawerDelegate(),
                 child: ListTile(
-                  title: Text(_formatOtpCode(item.otpCode)),
-                  subtitle: Text(item.issuer),
+                  title: Text(
+                    _formatOtpCode(item.otpCode),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30,
+                    ),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        item.issuer,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(item.account),
+                    ],
+                  ),
                   onTap: () {
                     Clipboard.setData(new ClipboardData(text: item.otpCode));
                     Scaffold.of(context).showSnackBar(SnackBar(

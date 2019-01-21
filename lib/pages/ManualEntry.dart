@@ -145,7 +145,7 @@ class _ManualEntryState extends State<ManualEntry> {
     return () {
       if (this._formKey.currentState.validate()) {
         this._formKey.currentState.save();
-        key.currentState.addOtpItem(_otpItem);
+        otpListKey.currentState.addOtpItem(_otpItem);
         Navigator.pop(context, true);
       }
     };

@@ -69,7 +69,7 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
             digits: _getUriDigits(uri),
 //            timeBased: uri.path.toLowerCase().contains('totp'),
           );
-          key.currentState.addOtpItem(otpItem);
+          otpListKey.currentState.addOtpItem(otpItem);
           Navigator.pop(context, true);
         }
         this.validationDisabled = false;
