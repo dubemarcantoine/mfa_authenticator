@@ -138,8 +138,7 @@ class _CountdownTimerState extends State<CountdownTimer>
 
   void _startCountdown(int secondsUntilNextRefresh) {
     _controller.duration = Duration(seconds: secondsUntilNextRefresh);
-    _controller.value = 1.0 - (1.0 - (secondsUntilNextRefresh / 30));
-    _controller.reverse(from: 1.0);
+    _controller.reverse(from:  1.0 - (1.0 - (secondsUntilNextRefresh / 30)));
   }
 }
 
