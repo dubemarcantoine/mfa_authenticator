@@ -123,9 +123,12 @@ class _CountdownTimerState extends State<CountdownTimer>
   }
 
   void _initInitialCountdown() {
-    final int secondsUntilNextRefresh = TimeHelper.getSecondsUntilNextRefresh();
-    _startCountdown(secondsUntilNextRefresh);
-    CancelableOperation.fromFuture(Future.delayed(Duration(seconds: secondsUntilNextRefresh), () => _initCountdownRefreshTimer()));
+    if (_controller.value >= 0.985 || _controller.value <= 0.015) {
+      print('countdown initiated');
+      final int secondsUntilNextRefresh = TimeHelper.getSecondsUntilNextRefresh();
+      _startCountdown(secondsUntilNextRefresh);
+      CancelableOperation.fromFuture(Future.delayed(Duration(seconds: secondsUntilNextRefresh), () => _initCountdownRefreshTimer()));
+    }
   }
 
   void _initCountdownRefreshTimer() {
@@ -135,6 +138,7 @@ class _CountdownTimerState extends State<CountdownTimer>
 
   void _startCountdown(int secondsUntilNextRefresh) {
     _controller.duration = Duration(seconds: secondsUntilNextRefresh);
+    _controller.value = 1.0 - (1.0 - (secondsUntilNextRefresh / 30));
     _controller.reverse(from: 1.0);
   }
 }
