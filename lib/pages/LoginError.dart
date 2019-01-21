@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:mfa_authenticator/main.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginError extends StatelessWidget {
   @override
@@ -19,13 +22,30 @@ class LoginError extends StatelessWidget {
             ),
           ),
           RaisedButton(
+            onPressed: _goToSettings,
+            child: Text('CHECK APP PERMISSIONS'),
+          ),
+          RaisedButton(
             onPressed: () {
               appKey.currentState.tryAuthenticate();
             },
-            child: Text('TRY AGAIN'),
+            child: Text('LOGIN'),
           ),
         ],
       ),
     );
+  }
+
+  void _goToSettings() async {
+    String url;
+    if (Platform.isIOS) {
+      url = 'App-prefs:root?path=Authenticator%20MFA';
+    }
+    if (await canLaunch(url)) {
+      print('launch');
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

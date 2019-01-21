@@ -20,6 +20,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   local_auth: ^0.3.1
+  url_launcher: ^4.0.3
   shared_preferences: ^0.4.3
   otp: 1.0.1
   sqflite: 0.13.0+1
