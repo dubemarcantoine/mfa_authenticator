@@ -40,7 +40,7 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
                             padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
                             child: Text(
                               'Could not open camera. '
-                                  'Please make sure that the camer is active in your Settings app and try again.',
+                                  'Please make sure that the camera is active in your Settings app and try again.',
                               textScaleFactor: 1.05,
                             ),
                           ),
