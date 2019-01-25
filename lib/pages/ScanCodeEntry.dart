@@ -75,7 +75,6 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
         });
       } else {
         if (!this.readyToExit) {
-          this.readyToExit = true;
           OtpItem otpItem = new OtpItem(
             secret: uri.queryParameters['secret'],
             issuer: _getUriIssuer(uri),
@@ -83,6 +82,7 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
             digits: _getUriDigits(uri),
 //            timeBased: uri.path.toLowerCase().contains('totp'),
           );
+          this.readyToExit = true;
           otpListKey.currentState.addOtpItem(otpItem);
           Navigator.pop(context, true);
         }
@@ -92,7 +92,7 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
   }
 
   String _getUriIssuer(Uri uri) {
-    String issuer = Uri.decodeFull(uri.queryParameters['issuer']);
+    String issuer = _uriDecode(uri.queryParameters['issuer']);
     if (issuer != null) {
       return issuer;
     }
@@ -105,7 +105,7 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
 
   String _getUriLabelPartAt(Uri uri, int index) {
     String label =
-        Uri.decodeFull(uri.pathSegments.elementAt(uri.pathSegments.length - 1));
+        _uriDecode(uri.pathSegments.elementAt(uri.pathSegments.length - 1));
     List<String> parts = label.split(':');
     if (parts.length > index) {
       return parts.elementAt(index);
@@ -120,6 +120,13 @@ class _ScanCodeEntryState extends State<ScanCodeEntry> {
     } else {
       return 6;
     }
+  }
+
+  String _uriDecode(String str) {
+    if (str != null) {
+      return Uri.decodeFull(str);
+    }
+    return str;
   }
 
   Future<void> _showErrorDialog() async {
