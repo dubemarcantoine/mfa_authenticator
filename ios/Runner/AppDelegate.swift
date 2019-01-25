@@ -8,7 +8,7 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?
   ) -> Bool {
     let controller : FlutterViewController = window?.rootViewController as! FlutterViewController
-    let appPrefChannel = FlutterMethodChannel(name: "dubemarcantoine.github.io/authenticator_mfa",
+    let appPrefChannel = FlutterMethodChannel(name: "io.github.dubemarcantoine/authenticator_mfa",
                                               binaryMessenger: controller)
     appPrefChannel.setMethodCallHandler({
         (call: FlutterMethodCall, result: FlutterResult) -> Void in

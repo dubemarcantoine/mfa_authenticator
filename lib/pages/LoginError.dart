@@ -4,7 +4,7 @@ import 'package:mfa_authenticator/main.dart';
 
 class LoginError extends StatelessWidget {
   static const platform =
-      const MethodChannel('dubemarcantoine.github.io/authenticator_mfa');
+      const MethodChannel('io.github.dubemarcantoine/authenticator_mfa');
 
   @override
   Widget build(BuildContext context) {
