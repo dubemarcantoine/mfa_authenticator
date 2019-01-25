@@ -1,16 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:mfa_authenticator/components/AppDrawer.dart';
-import 'package:mfa_authenticator/components/CountdownTimer.dart';
-import 'package:mfa_authenticator/components/OtpOptionFabMenu.dart';
-import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
-import 'package:mfa_authenticator/helpers/TimeHelper.dart';
-import 'package:mfa_authenticator/model/OtpItem.dart';
+import 'package:authenticator/components/AppDrawer.dart';
+import 'package:authenticator/components/CountdownTimer.dart';
+import 'package:authenticator/components/OtpOptionFabMenu.dart';
+import 'package:authenticator/data/OtpItemDataMapper.dart';
+import 'package:authenticator/helpers/TimeHelper.dart';
+import 'package:authenticator/model/OtpItem.dart';
 import 'package:otp/otp.dart';
+import 'package:path_provider/path_provider.dart';
 
 final otpListKey = new GlobalKey<_OtpListState>();
 
@@ -161,12 +163,12 @@ class _OtpListState extends State<OtpList>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        item.issuer,
+                        item.issuer ?? '',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(item.account),
+                      Text(item.account ?? ''),
                     ],
                   ),
                   onTap: () {
