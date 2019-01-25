@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mfa_authenticator/helpers/BiometricsHelper.dart';
-import 'package:mfa_authenticator/pages/LoginError.dart';
-import 'package:mfa_authenticator/pages/OtpList.dart';
-import 'package:mfa_authenticator/pages/SecurityConfig.dart';
+import 'package:authenticator/helpers/BiometricsHelper.dart';
+import 'package:authenticator/pages/LoginError.dart';
+import 'package:authenticator/pages/OtpList.dart';
+import 'package:authenticator/pages/SecurityConfig.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:mfa_authenticator/data/OtpItemDataMapper.dart';
+import 'package:authenticator/data/OtpItemDataMapper.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -21,7 +21,7 @@ class DbProvider {
 
   initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, "mfa_authenticator.db");
+    String path = join(documentsDirectory.path, "authenticator.db");
     return await openDatabase(path, version: 1, onOpen: (db) {},
         onCreate: (Database db, int version) async {
       await db.execute("""CREATE TABLE ${OtpItemDataMapper.otpItemTableName} (

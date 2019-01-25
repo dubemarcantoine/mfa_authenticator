@@ -1,5 +1,5 @@
-import 'package:mfa_authenticator/data/DbProvider.dart';
-import 'package:mfa_authenticator/model/OtpItem.dart';
+import 'package:authenticator/data/DbProvider.dart';
+import 'package:authenticator/model/OtpItem.dart';
 
 class OtpItemDataMapper {
   static final String otpItemTableName = 'otp_item';

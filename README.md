@@ -1,4 +1,4 @@
-# mfa_authenticator
+# authenticator
 
 Securely use multi factor authentication for your favorite websites ands apps
 

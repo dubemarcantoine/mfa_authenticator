@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mfa_authenticator/main.dart';
+import 'package:authenticator/main.dart';
 
 class LoginError extends StatelessWidget {
   static const platform =

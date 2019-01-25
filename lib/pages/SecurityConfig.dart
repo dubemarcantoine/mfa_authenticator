@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/helpers/BiometricsHelper.dart';
+import 'package:authenticator/helpers/BiometricsHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecurityConfig extends StatefulWidget {

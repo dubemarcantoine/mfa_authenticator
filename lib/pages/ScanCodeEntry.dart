@@ -1,8 +1,8 @@
 import 'dart:core';
 
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/model/OtpItem.dart';
-import 'package:mfa_authenticator/pages/OtpList.dart';
+import 'package:authenticator/model/OtpItem.dart';
+import 'package:authenticator/pages/OtpList.dart';
 import 'package:qr_mobile_vision/qr_camera.dart';
 
 class ScanCodeEntry extends StatefulWidget {

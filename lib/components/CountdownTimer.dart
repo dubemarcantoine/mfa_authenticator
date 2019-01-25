@@ -3,7 +3,7 @@ import 'dart:math' as math;
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/helpers/TimeHelper.dart';
+import 'package:authenticator/helpers/TimeHelper.dart';
 
 class CountdownTimer extends StatefulWidget {
   @override

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mfa_authenticator/model/OtpItem.dart';
-import 'package:mfa_authenticator/pages/OtpList.dart';
+import 'package:authenticator/model/OtpItem.dart';
+import 'package:authenticator/pages/OtpList.dart';
 
 class ManualEntry extends StatefulWidget {
   @override
