@@ -30,7 +30,8 @@ class DbProvider {
             issuer TEXT,
             account TEXT,
             time_based BOOL,
-            length INTEGER
+            length INTEGER,
+            created_at DATE DEFAULT (datetime('now'))
           )""");
     });
   }
