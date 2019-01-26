@@ -19,7 +19,7 @@ class OtpItem {
         id: json['id'],
         secret: json['secret'],
         issuer: json['issuer'],
-        account: json['label'],
+        account: json['account'],
         timeBased: json['time_based'] == 1,
         digits: json['length'],
       );
