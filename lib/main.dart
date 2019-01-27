@@ -4,6 +4,7 @@ import 'package:authenticator/helpers/BiometricsHelper.dart';
 import 'package:authenticator/pages/LoginError.dart';
 import 'package:authenticator/pages/OtpList.dart';
 import 'package:authenticator/pages/SecurityConfig.dart';
+import 'package:authenticator/pages/SplashScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -45,7 +46,7 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     Widget homeWidget;
     if (_result == null) {
-      homeWidget = Container();
+      homeWidget = SplashScreen();
     } else if (!_result) {
       homeWidget = LoginError();
     } else {
