@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:authenticator/helpers/BiometricsHelper.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecurityConfig extends StatefulWidget {
@@ -10,12 +11,15 @@ class SecurityConfig extends StatefulWidget {
 }
 
 class _SecurityConfigState extends State<SecurityConfig> {
+  static const platform =
+      const MethodChannel('io.github.dubemarcantoine/authenticator_mfa');
   BiometricsHelper biometricsHelper = BiometricsHelper();
   SharedPreferences _preferences;
   bool _isUsingBiometricsAuthentication = false;
-  Function _onBiometricsPreferenceChangeFunction;
 
+  @override
   void initState() {
+    super.initState();
     _initPreferences();
   }
 
@@ -39,7 +43,7 @@ class _SecurityConfigState extends State<SecurityConfig> {
           SwitchListTile(
             value: _isUsingBiometricsAuthentication,
             title: Text('Biometric authentication'),
-            onChanged: _onBiometricsPreferenceChangeFunction,
+            onChanged: _onBiometricsPreferenceChange,
           ),
         ],
       ),
@@ -50,15 +54,12 @@ class _SecurityConfigState extends State<SecurityConfig> {
   ///  If no biometrics available on device, this preference will not be
   ///  able to be changed
   void _initPreferences() async {
-    if (await biometricsHelper.hasBiometrics()) {
-      _onBiometricsPreferenceChangeFunction = _onBiometricsPreferenceChange;
-      _preferences = await SharedPreferences.getInstance();
-      setState(() {
-        _isUsingBiometricsAuthentication =
-            _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ??
-                false;
-      });
-    }
+    _preferences = await SharedPreferences.getInstance();
+    setState(() {
+      _isUsingBiometricsAuthentication =
+          _preferences.getBool(SecurityConfig.IS_USING_BIOMETRICS_AUTH_KEY) ??
+              false;
+    });
   }
 
   void _onBiometricsPreferenceChange(bool newValue) async {
