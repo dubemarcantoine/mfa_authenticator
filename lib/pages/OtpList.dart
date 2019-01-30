@@ -190,7 +190,7 @@ class _OtpListState extends State<OtpList>
   }
 
   String _formatOtpCode(String otpCode) {
-    return otpCode?.splitMapJoin(RegExp('..'),
+    return otpCode?.splitMapJoin(RegExp('...'),
         onMatch: (m) => '${m.group(0)} ');
   }
 
