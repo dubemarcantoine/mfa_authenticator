@@ -12,7 +12,6 @@ import 'package:authenticator/data/OtpItemDataMapper.dart';
 import 'package:authenticator/helpers/TimeHelper.dart';
 import 'package:authenticator/model/OtpItem.dart';
 import 'package:otp/otp.dart';
-import 'package:path_provider/path_provider.dart';
 
 final otpListKey = new GlobalKey<_OtpListState>();
 
@@ -82,7 +81,6 @@ class _OtpListState extends State<OtpList>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    print(state.toString());
     switch (state) {
       case AppLifecycleState.inactive:
         break;
@@ -121,9 +119,11 @@ class _OtpListState extends State<OtpList>
   }
 
   void _setStateForOtpCodes() {
-    setState(() {
-      this._generateCodesFromSecrets();
-    });
+    if (this.mounted) {
+      setState(() {
+        this._generateCodesFromSecrets();
+      });
+    }
   }
 
   void _generateCodesFromSecrets() {

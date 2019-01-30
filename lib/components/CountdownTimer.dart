@@ -36,6 +36,7 @@ class _CountdownTimerState extends State<CountdownTimer>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _controller.stop();
     _controller.dispose();
     super.dispose();
   }
