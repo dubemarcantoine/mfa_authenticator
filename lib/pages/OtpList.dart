@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,7 @@ import 'package:otp/otp.dart';
 final otpListKey = new GlobalKey<_OtpListState>();
 
 class OtpList extends StatefulWidget {
-  String title;
+  final String title;
 
   OtpList({this.title}) : super(key: otpListKey);
 
@@ -197,7 +196,7 @@ class _OtpListState extends State<OtpList>
   void _onDeleteTap(OtpItem otpItem) async {
     final bool userResponse = await _deleteConfirmationDialog();
     if (userResponse) {
-      await OtpItemDataMapper.delete(otpItem.id);
+      OtpItemDataMapper.delete(otpItem.id);
       setState(() {
         this.otpItems.removeWhere((itemInList) => itemInList.id == otpItem.id);
       });

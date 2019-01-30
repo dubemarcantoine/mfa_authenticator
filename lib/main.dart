@@ -40,6 +40,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
     tryAuthenticate();
   }
