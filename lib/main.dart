@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:authenticator/helpers/BiometricsHelper.dart';
 import 'package:authenticator/pages/LoginError.dart';
 import 'package:authenticator/pages/OtpList.dart';
 import 'package:authenticator/pages/SecurityConfig.dart';
 import 'package:authenticator/pages/SplashScreen.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -30,26 +30,35 @@ class App extends StatefulWidget {
   _AppState createState() => _AppState();
 }
 
-class _AppState extends State<App> {
+class _AppState extends State<App> with WidgetsBindingObserver {
   BiometricsHelper _biometricsHelper = BiometricsHelper();
   SharedPreferences _preferences;
+  DateTime _lastPause;
 
-  var _result;
+  bool _authenticationResult = false;
+  bool _showSplashScreen = true;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     tryAuthenticate();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Widget homeWidget;
-    if (_result == null) {
+    Widget homeWidget = SplashScreen();
+    if (_showSplashScreen) {
       homeWidget = SplashScreen();
-    } else if (!_result) {
+    } else if (!_authenticationResult) {
       homeWidget = LoginError();
-    } else {
+    } else if (_authenticationResult) {
       homeWidget = OtpList(title: 'Authenticator');
     }
     return MaterialApp(
@@ -65,10 +74,49 @@ class _AppState extends State<App> {
     );
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    print(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.paused:
+        setState(() {
+          _showSplashScreen = true;
+        });
+        _lastPause = DateTime.now();
+        break;
+      case AppLifecycleState.suspending:
+        setState(() {
+          _showSplashScreen = true;
+        });
+        break;
+      case AppLifecycleState.resumed:
+        if (_lastPause != null) {
+          Duration timeDifference = DateTime.now().difference(_lastPause);
+          _lastPause = null;
+          if (timeDifference.inSeconds > 60) {
+            tryAuthenticate();
+          } else {
+            setState(() {
+              _showSplashScreen = false;
+            });
+          }
+        } else {
+          setState(() {
+            _showSplashScreen = false;
+          });
+        }
+        break;
+    }
+  }
+
   void tryAuthenticate() {
     _authenticate().then((res) {
       setState(() {
-        _result = res;
+        _authenticationResult = res;
+        _showSplashScreen = false;
       });
     });
   }
