@@ -89,9 +89,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         _lastPause = DateTime.now();
         break;
       case AppLifecycleState.suspending:
-        setState(() {
-          _showSplashScreen = true;
-        });
         break;
       case AppLifecycleState.resumed:
         if (_lastPause != null) {
