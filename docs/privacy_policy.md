@@ -1,4 +1,4 @@
-## Privacy Policy
+# Privacy Policy
 
 Marc-Antoine Dube built the Authenticator app as an Open Source app. This SERVICE is provided by Marc-Antoine Dube at no cost and is intended for use as is.
 
