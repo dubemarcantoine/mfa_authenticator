@@ -35,8 +35,8 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   SharedPreferences _preferences;
   DateTime _lastPause;
 
+  HomeScreenState _homeScreenState = HomeScreenState.SPLASHSCREEN;
   bool _authenticationResult = false;
-  bool _showSplashScreen = true;
 
   @override
   void initState() {
@@ -54,14 +54,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Widget homeWidget = SplashScreen();
-    if (_showSplashScreen) {
-      homeWidget = SplashScreen();
-    } else if (!_authenticationResult) {
-      homeWidget = LoginError();
-    } else if (_authenticationResult) {
-      homeWidget = OtpList(title: 'Authenticator');
-    }
     return MaterialApp(
       title: 'Authenticator',
       theme: ThemeData(
@@ -71,7 +63,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         primaryColorDark: Colors.blue,
         toggleableActiveColor: Colors.blue,
       ),
-      home: homeWidget,
+      home: _getHomeScreen(),
     );
   }
 
@@ -84,7 +76,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
         setState(() {
-          _showSplashScreen = true;
+          _homeScreenState = HomeScreenState.SPLASHSCREEN;
         });
         _lastPause = DateTime.now();
         break;
@@ -98,12 +90,12 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             tryAuthenticate();
           } else {
             setState(() {
-              _showSplashScreen = false;
+              _setHomeScreenState();
             });
           }
         } else {
           setState(() {
-            _showSplashScreen = false;
+            _setHomeScreenState();
           });
         }
         break;
@@ -112,10 +104,31 @@ class _AppState extends State<App> with WidgetsBindingObserver {
 
   void tryAuthenticate() {
     _authenticate().then((res) {
-      setState(() {
-        _authenticationResult = res;
-        _showSplashScreen = false;
-      });
+      _authenticationResult = res;
+      _setHomeScreenState();
+    });
+  }
+
+  Widget _getHomeScreen() {
+    switch (_homeScreenState) {
+      case HomeScreenState.SPLASHSCREEN:
+        return SplashScreen();
+      case HomeScreenState.ERROR_LOGIN:
+        return LoginError();
+      case HomeScreenState.SUCCESS_LOGIN:
+        return OtpList(title: 'Authenticator');
+      default:
+        return SplashScreen();
+    }
+  }
+
+  void _setHomeScreenState() {
+    setState(() {
+      if (_authenticationResult) {
+        _homeScreenState = HomeScreenState.SUCCESS_LOGIN;
+      } else {
+        _homeScreenState = HomeScreenState.ERROR_LOGIN;
+      }
     });
   }
 
@@ -137,4 +150,10 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       return Future.value(false);
     }
   }
+}
+
+enum HomeScreenState {
+  SPLASHSCREEN,
+  ERROR_LOGIN,
+  SUCCESS_LOGIN,
 }
